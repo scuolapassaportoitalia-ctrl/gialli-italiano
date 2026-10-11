@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style><title>Delitto a Villa Rufina</title></head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout concept: a police case file on a phone. Sticky header with hazard tape, one column of evidence cards, fixed bottom tab bar. */
+:root{
+  --bg:#E6E9E7; --surface:#F7F8F6; --fg:#15202B; --muted:#4F5C67; --line:#C5CCC8;
+  --tape:#F2C300; --on-tape:#15202B; --stamp:#B3261E; --sea:#0A5A70; --yes:#1B6E45; --no:#B3261E;
+  --display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'Courier Prime','Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151A; --surface:#192027; --fg:#E8ECEA; --muted:#9BA8B2; --line:#2B353E;
+    --stamp:#FF7A6E; --sea:#6CC6DC; --yes:#5FD08F; --no:#FF7A6E; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10151A; --surface:#192027; --fg:#E8ECEA; --muted:#9BA8B2; --line:#2B353E;
+  --stamp:#FF7A6E; --sea:#6CC6DC; --yes:#5FD08F; --no:#FF7A6E; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0;line-height:1.1;text-wrap:balance}
+h2{font-size:26px}
+h3{font-size:19px;margin-bottom:6px}
+p{margin:0}
+small{font-size:13px;color:var(--muted)}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tape{height:10px;background:repeating-linear-gradient(-45deg,var(--tape) 0 14px,#15202B 14px 28px)}
+.top-row{display:flex;align-items:center;gap:10px;padding-block:8px}
+.brand{flex:1;min-width:0}
+.brand h1{font-size:28px;letter-spacing:.05em}
+.brand span{display:block;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pill{min-height:40px;min-width:44px;padding:0 12px;border:2px solid var(--fg);background:transparent;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:14px}
+.pill[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:var(--bg)}
+
+/* layout */
+.main{padding-block:18px 110px;display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tag{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.08em;background:var(--tape);color:var(--on-tape);padding:2px 8px;border-radius:2px;text-transform:uppercase}
+.it{font-size:19px;line-height:1.55;overflow-wrap:anywhere}
+.en{color:var(--sea);font-size:16px;line-height:1.5;border-top:1px dashed var(--line);padding-top:8px;overflow-wrap:anywhere}
+.entog{align-self:flex-start;min-height:36px;padding:0 12px;border:1px solid var(--sea);color:var(--sea);background:transparent;border-radius:4px;font-size:14px;font-weight:700}
+.entog[aria-expanded="true"]{background:var(--sea);color:var(--bg)}
+.w{padding:0;border:0;border-bottom:2px dotted var(--sea);background:none;font:inherit;line-height:inherit;color:inherit;cursor:help}
+.gloss{background:var(--tape);color:var(--on-tape);font-weight:700;padding:6px 10px;border-radius:3px;font-size:16px;align-self:flex-start}
+.ico{width:44px;height:44px;border:1px solid var(--line);background:transparent;border-radius:50%;display:grid;place-items:center;flex:none}
+.ico[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:var(--bg)}
+.ico svg{width:22px;height:22px}
+
+/* buttons */
+.btn{min-height:50px;padding:0 20px;border:2px solid var(--fg);background:var(--fg);color:var(--bg);border-radius:4px;font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn.tape{background:var(--tape);color:var(--on-tape);border-color:var(--on-tape)}
+.btn.ghost{background:transparent;color:var(--fg)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn small{display:block;font-family:var(--body);font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:inherit;opacity:.85}
+.link{background:none;border:0;padding:8px 0;color:var(--muted);text-decoration:underline;font-size:15px;align-self:flex-start;min-height:44px}
+
+/* setup */
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chip{min-height:48px;border:2px solid var(--fg);background:transparent;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:18px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.chip[disabled]{opacity:.3;cursor:not-allowed}
+.q{font-weight:700;font-size:18px}
+.q small{display:block;font-weight:400}
+
+/* rounds */
+.rounds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rd{min-height:56px;border:2px solid var(--fg);background:transparent;border-radius:4px;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;padding:4px}
+.rd[aria-pressed="true"]{background:var(--tape);color:var(--on-tape);border-color:var(--on-tape)}
+.rd[aria-disabled="true"]{opacity:.45;border-style:dashed}
+.rd svg{width:16px;height:16px;flex:none}
+.task{border-left:6px solid var(--tape);padding-left:12px}
+.ask{background:transparent;border:2px dashed var(--muted)}
+
+/* cast */
+.av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:700;font-size:24px;flex:none}
+.who{display:flex;gap:12px;align-items:center}
+.who b{font-family:var(--display);font-size:22px;text-transform:uppercase;letter-spacing:.03em;display:block;line-height:1.1}
+.who span{font-size:15px;color:var(--muted)}
+
+/* notebook */
+.tw{overflow-x:auto}
+table.nb{border-collapse:collapse;width:100%;min-width:340px}
+.nb th,.nb td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.nb thead th{font-family:var(--mono);font-size:12px;text-transform:uppercase;vertical-align:bottom}
+.nb thead th small{display:block;text-transform:none;font-family:var(--body)}
+.nb tbody th{text-align:left;font-weight:700;font-size:16px;padding-right:8px}
+.nb tbody th small{display:block;font-weight:400}
+.cell{width:100%;min-width:52px;min-height:48px;border:2px solid var(--line);background:transparent;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:16px;color:var(--muted)}
+.cell.y{border-color:var(--yes);color:var(--yes);background:color-mix(in srgb,var(--yes) 14%,transparent)}
+.cell.n{border-color:var(--no);color:var(--no);background:color-mix(in srgb,var(--no) 14%,transparent)}
+
+/* accuse */
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:4px;background:var(--surface);min-height:56px}
+.opt input{width:24px;height:24px;margin:2px 0 0;accent-color:var(--sea);flex:none}
+.opt:has(input:checked){border-color:var(--fg)}
+.opt .e{display:block;color:var(--sea);font-size:15px}
+.msg{padding:12px 14px;border-radius:4px;background:var(--surface);border:2px solid var(--stamp)}
+.msg .e{display:block;color:var(--sea);font-size:15px}
+.stamp{display:inline-block;align-self:flex-start;border:4px solid var(--stamp);color:var(--stamp);font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:.08em;padding:2px 14px;transform:rotate(-5deg);text-transform:uppercase}
+@media (prefers-reduced-motion:no-preference){
+  .stamp{animation:st .35s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes st{from{transform:rotate(-14deg) scale(1.9);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+}
+ul.pl{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+ol.steps li span{display:block;color:var(--sea);font-size:15px}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:2px solid var(--fg);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{min-height:58px;border:0;background:none;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.05em;text-transform:uppercase;border-top:5px solid transparent;margin-top:-2px;padding:4px 2px}
+.tab small{display:block;font-family:var(--body);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0}
+.tab[aria-current="page"]{border-top-color:var(--tape);background:color-mix(in srgb,var(--tape) 16%,transparent)}
+
+/* overlay */
+.ov{position:fixed;inset:0;z-index:20;background:var(--bg);overflow:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.ov .wrap{padding-block:16px 40px;display:flex;flex-direction:column;gap:12px}
+.ov input[type=search]{min-height:48px;padding:0 12px;border:2px solid var(--fg);border-radius:4px;background:var(--surface);color:var(--fg);font:inherit;width:100%}
+.gl-item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.gl-item b{overflow-wrap:anywhere}
+.gl-item span{color:var(--sea);text-align:right;overflow-wrap:anywhere}
+table.tt{border-collapse:collapse;width:100%;font-size:15px}
+.tt th,.tt td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}
+.tt td.c{font-family:var(--mono);text-align:center}
+
+.prog{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:6px}
+.prog i{display:block;height:100%;background:var(--tape)}
+.turn{background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:4px;display:flex;flex-direction:column}
+.turn small{color:inherit;opacity:.85}
+.txt{min-height:48px;padding:0 12px;border:2px solid var(--fg);border-radius:4px;background:var(--surface);color:var(--fg);font:inherit;width:100%;min-width:0}
+textarea.txt{min-height:96px;padding:10px 12px;resize:vertical}
+details.old{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+details.old summary{min-height:48px;display:flex;align-items:center;padding:0 14px;font-weight:700;cursor:pointer}
+details.old .card{border:0;border-top:1px solid var(--line);border-radius:0}
+</style>
+
+<div id="app"></div>
+<div id="gl" class="ov" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var TTS=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
+var SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+var LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+/* ---------- content ---------- */
+var CAST=[
+ {id:'filippo',name:'Filippo Ricci',age:38,role:'figlio della Contessa',roleEn:"the Countess's son",desc:'Ama le auto sportive e il [lusso|luxury].',descEn:'He loves sports cars and luxury.',color:'#2F6F8F'},
+ {id:'giada',name:'Giada Ricci',age:28,role:'figlia della Contessa',roleEn:"the Countess's daughter",desc:'Ama gli animali. Ha un grande sogno per la villa.',descEn:'She loves animals. She has a big dream for the villa.',color:'#8A4F7D'},
+ {id:'ascanio',name:"Ascanio dell'Orto",age:42,role:'nipote',roleEn:'nephew',desc:'È il fidanzato di Ludovica.',descEn:"He is Ludovica's fiancé.",color:'#9A6B2F'},
+ {id:'ludovica',name:'Ludovica Vanesi',age:23,role:'fidanzata di Ascanio',roleEn:"Ascanio's fiancée",desc:'Lavora nel cinema.',descEn:'She works in film.',color:'#3F7D4F'},
+ {id:'maria',name:'Maria Fedeli',age:52,role:'cameriera',roleEn:'maid',desc:'Lavora a Villa Rufina da più di 25 anni.',descEn:'She has worked at Villa Rufina for more than 25 years.',color:'#55616B'},
+ {id:'vittorio',name:'Vittorio Fracco',age:28,role:'cuoco',roleEn:'cook',desc:'È il nuovo cuoco. Ha molte idee, ma poca [esperienza|experience].',descEn:'He is the new cook. He has many ideas but little experience.',color:'#3D5BA8'},
+ {id:'guglielmo',name:'Guglielmo Giovine',age:57,role:'compagno della Contessa',roleEn:"the Countess's partner",desc:'Ama le feste e il tennis.',descEn:'He loves parties and tennis.',color:'#A84B4B'},
+ {id:'aurora',name:'Aurora Belgrano',age:22,role:'nipote',roleEn:'niece',desc:'Studia economia a Milano.',descEn:'She studies economics in Milan.',color:'#7A4FA8'},
+ {id:'sofia',name:'Sofia Beccaria',age:61,role:'sorella della Contessa',roleEn:"the Countess's sister",desc:'È la sorella di Carlotta.',descEn:"She is Carlotta's sister.",color:'#2F7D7D'}
+];
+
+var STORY={
+ it:[
+  '[Villa Rufina|Villa Rufina] è una bella [tenuta|estate] nel [Chianti|Chianti region], in Toscana. Produce [vino|wine]. La famiglia Ricci [guida|runs] l\'azienda. La capo è la Contessa Carlotta Ricci.',
+  'Sui giornali c\'è già la notizia: la Contessa [vende|sells] la tenuta a un\'azienda straniera. Nel weekend la Contessa organizza un pranzo di famiglia per parlarne.',
+  'Alle 15:40 Maria, la cameriera, trova la Contessa a terra nella [serra|greenhouse]. Il vicequestore Volponi arriva subito. Dice: «Nessuno lascia la villa!»',
+  'Voi siete [investigatori|detectives]. Ogni persona ha [indizi|clues] diversi sul telefono. Leggete a voce alta e parlate insieme. Nove persone sono nella villa.'
+ ],
+ en:[
+  'Villa Rufina is a beautiful estate in the Chianti region, in Tuscany. It produces wine. The Ricci family runs the company. The head is Countess Carlotta Ricci.',
+  'The news is already in the papers: the Countess is selling the estate to a foreign company. At the weekend the Countess organises a family lunch to talk about it.',
+  'At 15:40 Maria, the maid, finds the Countess on the floor in the greenhouse. Deputy Police Chief Volponi arrives at once. He says: “Nobody leaves the villa!”',
+  'You are detectives. Each person has different clues on their phone. Read aloud and talk together. Nine people are in the villa.'
+ ]
+};
+var RULES=[
+ ['Leggi il tuo indizio a [voce alta|out loud].','Read your clue out loud.'],
+ ['Ascolta gli altri giocatori.','Listen to the other players.'],
+ ['Scrivi nel taccuino.','Write in the notebook.'],
+ ['Alla fine, [accusa|accuse] il colpevole.','At the end, accuse the culprit.']
+];
+
+var ROUNDS={
+ 2:{t:'Perché?',te:'Why? (motives)',task:'Leggete gli indizi a voce alta. Chi è contro la vendita? Chi ha bisogno di soldi?',taskEn:'Read the clues out loud. Who is against the sale? Who needs money?'},
+ 3:{t:'I fatti',te:'The facts',task:'Leggete gli indizi. Che cosa succede in serra? Che cosa dicono gli oggetti?',taskEn:'Read the clues. What happens in the greenhouse? What do the objects tell us?'},
+ 4:{t:'Alibi',te:'Alibis',task:'Leggete gli indizi. Dove sono tutti dalle 14:30 alle 15:40? Chi ha un [alibi|proof you were somewhere else] e chi no?',taskEn:'Read the clues. Where is everybody from 14:30 to 15:40? Who has an alibi and who does not?'}
+};
+
+var CLUES=[
+ {id:'2.1',r:2,t:'La fondazione',it:'La Contessa vende la tenuta perché vuole aprire una [fondazione|foundation] per le persone [non udenti|deaf]. La tenuta vale circa 15 milioni di euro.',en:'The Countess is selling the estate because she wants to open a foundation for deaf people. The estate is worth about 15 million euros.'},
+ {id:'2.2',r:2,t:'Filippo',it:'Filippo, il figlio, ha 38 anni. Ama le auto sportive e il lusso. Per questo ha sempre bisogno di soldi.',en:'Filippo, the son, is 38. He loves sports cars and luxury. For this reason he always needs money.'},
+ {id:'2.3',r:2,t:'Giada',it:'Giada, la figlia, sogna un centro per gli animali [abbandonati|abandoned] a Villa Rufina. Se la tenuta passa a un\'azienda straniera, il sogno finisce.',en:'Giada, the daughter, dreams of a centre for abandoned animals at Villa Rufina. If the estate goes to a foreign company, the dream ends.'},
+ {id:'2.4',r:2,t:'Ascanio',it:'Ascanio, il nipote, fa [investimenti|investments] sbagliati. Rischia la [bancarotta|bankruptcy]. Ha bisogno di soldi presto.',en:'Ascanio, the nephew, makes bad investments. He risks bankruptcy. He needs money soon.'},
+ {id:'2.5',r:2,t:'Ludovica',it:'Ludovica, la fidanzata di Ascanio, è [scenografa|set designer]. Vuole diventare [regista|film director] e fare un film tutto suo. Un film costa molto.',en:"Ludovica, Ascanio's fiancée, is a set designer. She wants to become a film director and make a film of her own. A film costs a lot."},
+ {id:'2.6',r:2,t:'Aurora',it:'Aurora, la nipote, ha 22 anni. È laureata in economia con il massimo dei voti. Pensa che vendere l\'azienda sia un grande errore.',en:'Aurora, the niece, is 22. She has a degree in economics with top marks. She thinks selling the company is a big mistake.'},
+ {id:'2.7',r:2,t:'Sofia',it:'Sofia, la sorella della Contessa, è [contraria|against] alla vendita. Si rompe un piede e usa la [sedia a rotelle|wheelchair].',en:"Sofia, the Countess's sister, is against the sale. She breaks a foot and uses a wheelchair."},
+ {id:'2.8',r:2,t:'Guglielmo',it:'Guglielmo, il compagno della Contessa, ha 57 anni. È un ex playboy e non lavora mai. Ama la vita piena di feste.',en:"Guglielmo, the Countess's partner, is 57. He is an ex-playboy and never works. He loves a life full of parties."},
+
+ {id:'3.1',r:3,t:'Il pranzo',it:'Nel weekend c\'è un pranzo di famiglia. Dopo il pranzo la Contessa dice: «Alle 17:00, in giardino, dico il nome dell\'azienda che compra le [cantine|wine cellars].»',en:'At the weekend there is a family lunch. After lunch the Countess says: “At 17:00, in the garden, I will say the name of the company that is buying the wine cellars.”'},
+ {id:'3.2',r:3,t:'Il ritrovamento',it:'Alle 15:40 Maria trova la Contessa a terra nella serra. La Contessa [sta molto male|is very ill] e muore poco dopo.',en:'At 15:40 Maria finds the Countess on the floor in the greenhouse. The Countess is very ill and dies a short time later.'},
+ {id:'3.3',r:3,t:'Le tazze',it:'Nella serra, sul tavolino, c\'è una tazza piena di [tisana|herbal tea]. La tazza è ancora piena. Sul pavimento c\'è una tazza uguale, [rovesciata|knocked over].',en:'In the greenhouse, on the small table, there is a cup full of herbal tea. The cup is still full. On the floor there is an identical cup, knocked over.'},
+ {id:'3.4',r:3,t:'Il laboratorio',it:'Il laboratorio analizza la tisana per terra: c\'è [cicuta|hemlock, a poisonous plant]. La dose è mortale. La polizia controlla anche il barattolo della tisana in dispensa: tra le foglie c\'è cicuta.',en:'The laboratory analyses the tea on the floor: it contains hemlock. The dose is deadly. The police also check the tea jar in the pantry: there is hemlock among the leaves.'},
+ {id:'3.5',r:3,t:'La mano',it:'La mano destra della Contessa è chiusa a [pugno|fist]. Il medico dice: «È una posizione strana.»',en:'The Countess\'s right hand is closed in a fist. The doctor says: “It is a strange position.”'},
+ {id:'3.6',r:3,t:'Il poster',it:'Nello studio della Contessa c\'è un poster con l\'[alfabeto dei segni|sign language alphabet] per le persone sorde. Il pugno chiuso è la lettera A.',en:"In the Countess's study there is a poster with the sign language alphabet for deaf people. The closed fist is the letter A."},
+ {id:'3.7',r:3,t:'La pianta',it:'Nella serra, in un angolo nascosto, Volponi trova una pianta di cicuta. Alcune foglie [mancano|are missing].',en:'In the greenhouse, in a hidden corner, Volponi finds a hemlock plant. Some leaves are missing.'},
+ {id:'3.8',r:3,t:'Chi sa?',it:'La famiglia sposta la pianta in un angolo, lontano dalle erbe aromatiche. Tutta la famiglia sa dove è la pianta. Maria e Vittorio non vanno mai in quell\'angolo.',en:'The family moves the plant to a corner, away from the herbs. The whole family knows where the plant is. Maria and Vittorio never go to that corner.'},
+ {id:'3.9',r:3,t:'Il biglietto',it:'Sulla scrivania della Contessa c\'è un [biglietto|note] con il codice dei segni. Dice: «SERRA ORE 15». Solo la Contessa capisce il codice.',en:"On the Countess's desk there is a note written in the sign code. It says: “GREENHOUSE 3 PM”. Only the Countess understands the code."},
+ {id:'3.10',r:3,t:'Quattro mesi fa',it:'Quattro mesi fa, alla festa di compleanno di Guglielmo, alcune persone vanno al pronto soccorso. Il laboratorio trova cicuta in dose non mortale: forse qualcuno la scambia per [prezzemolo|parsley]. Un giornale scrive che gli invitati rischiano la fine di [Socrate|Socrates, a Greek philosopher who died from hemlock].',en:"Four months ago, at Guglielmo's birthday party, some people go to the emergency room. The laboratory finds hemlock in a non-deadly dose: maybe someone mistakes it for parsley. A newspaper writes that the guests risk the fate of Socrates."},
+
+ {id:'4.1',r:4,t:'La telefonata',it:'Vittorio, il cuoco, dice: «Alle 14:30 la Contessa mi telefona. Vuole due tazze della solita tisana in serra alle 15:00.»',en:'Vittorio, the cook, says: “At 14:30 the Countess phones me. She wants two cups of the usual herbal tea in the greenhouse at 15:00.”'},
+ {id:'4.2',r:4,t:'La cantina',it:'Vittorio racconta: «Alle 14:45 Aurora mi telefona: in cantina si rompono delle bottiglie. Corro in cantina. Poi la Contessa mi chiama arrabbiata: la tisana non è in serra! Prendo la tisana dal solito barattolo e chiedo a Maria di servirla.»',en:'Vittorio tells us: “At 14:45 Aurora phones me: some bottles are breaking in the cellar. I run to the cellar. Then the Countess calls me, angry: the tea is not in the greenhouse! I take the tea from the usual jar and ask Maria to serve it.”'},
+ {id:'4.3',r:4,t:'Maria',it:'Maria dice: «Alle 15:10 porto due tazze di tisana in serra. Alle 15:40 torno per prendere le tazze. Trovo la Contessa a terra. Non c\'è nessun altro. La porta sul retro è aperta.»',en:'Maria says: “At 15:10 I take two cups of tea to the greenhouse. At 15:40 I go back to collect the cups. I find the Countess on the floor. Nobody else is there. The back door is open.”'},
+ {id:'4.4',r:4,t:'I testimoni',it:'Molte persone vedono Maria in villa tra le 14:00 e le 15:40. Filippo e Ascanio sono insieme in [salotto|living room] in questo tempo: parlano di investimenti.',en:'Many people see Maria in the villa between 14:00 and 15:40. Filippo and Ascanio are together in the living room during this time: they talk about investments.'},
+ {id:'4.5',r:4,t:'Giada',it:'Dalle 14:30 Giada è in [diretta|live] su Instagram dalla tenuta. Parla del centro per gli animali. Molte persone la guardano.',en:'From 14:30 Giada is live on Instagram from the estate. She talks about the animal centre. Many people are watching her.'},
+ {id:'4.6',r:4,t:'Ludovica',it:'Ludovica posta molti [selfie|selfies] nelle stanze della villa. I selfie hanno l\'ora: ce n\'è uno ogni dieci minuti dalle 14:00 alle 15:40. Nessun selfie è in cucina o in serra.',en:'Ludovica posts many selfies in the rooms of the villa. The selfies show the time: there is one every ten minutes from 14:00 to 15:40. No selfie is in the kitchen or in the greenhouse.'},
+ {id:'4.7',r:4,t:'Guglielmo',it:'Guglielmo ha un SMS di Claudio, un vecchio amico: «Ok per il tennis. Ci vediamo al campo della villa alle 14:30.» Il campo da tennis è vicino alla villa.',en:'Guglielmo has a text message from Claudio, an old friend: “OK for tennis. See you at the villa court at 14:30.” The tennis court is near the villa.'},
+ {id:'4.8',r:4,t:'Vittorio',it:'Vittorio ha una forte [allergia|allergy] alle piante. Non tocca mai le piante fresche e oggi non ha irritazioni sulle mani.',en:'Vittorio has a strong allergy to plants. He never touches fresh plants and today he has no irritation on his hands.'},
+ {id:'4.9',r:4,t:'Sofia',it:'Sofia scrive un SMS ad Aurora alle 11:30: «Sono preoccupata per la decisione di Carlotta. Dobbiamo farle cambiare idea!» Dalle 14:00 alle 16:00 Sofia è nella sua camera con il [fisioterapista|physiotherapist].',en:'Sofia sends Aurora a text message at 11:30: “I am worried about Carlotta\'s decision. We must make her change her mind!” From 14:00 to 16:00 Sofia is in her room with the physiotherapist.'},
+ {id:'4.10',r:4,t:'Aurora',it:'Aurora dice: «Dopo pranzo ho un forte mal di testa. Faccio una passeggiata da sola nei [vigneti|vineyards].» Nessuno la vede per tutto il pomeriggio.',en:'Aurora says: “After lunch I have a bad headache. I take a walk alone in the vineyards.” Nobody sees her all afternoon.'},
+ {id:'4.11',r:4,t:'I libri',it:'Aurora compra tre libri su internet: «Gestione aziendale», «Vita di Socrate» e «Marketing vincente».',en:'Aurora buys three books online: “Business Management”, “Life of Socrates” and “Winning Marketing”.'}
+];
+
+var QUESTIONS={
+ 2:[['Chi ha un motivo?','Who has a reason?'],['Chi ha bisogno di soldi?','Who needs money?'],['Chi è contro la vendita?','Who is against the sale?'],['Chi perde un sogno?','Who loses a dream?'],['Chi sta male?','Who has a problem?']],
+ 3:[['Che cosa c\'è nella tisana?','What is in the tea?'],['Che cosa vuole dire il pugno?','What does the fist mean?'],['Chi sa dove è la pianta?','Who knows where the plant is?'],['Dov\'è il veleno?','Where is the poison?'],['Che cosa dice il biglietto?','What does the note say?']],
+ 4:[['Chi ha un alibi?','Who has an alibi?'],['Chi è in cucina?','Who is in the kitchen?'],['Chi non ha un alibi?','Who has no alibi?'],['Chi telefona al cuoco?','Who phones the cook?'],['Chi è il colpevole? Perché?','Who is the culprit? Why?']]
+};
+
+var COLS=[{k:'motive',it:'Motivo',en:'Motive'},{k:'alibi',it:'Alibi',en:'Alibi'},{k:'letter',it:'Nome con A',en:'Name with A'},{k:'plant',it:'Sa la pianta',en:'Knows plant'}];
+
+var PROOFS=[
+ {k:'alibi',it:'Non ha un alibi.',en:'Has no alibi.',ok:true},
+ {k:'letter',it:'Il suo nome inizia con A, come il pugno della Contessa.',en:"Their name starts with A, like the Countess's fist.",ok:true},
+ {k:'call',it:'Telefona al cuoco: la cucina è libera.',en:'Phones the cook: the kitchen is free.',ok:true},
+ {k:'allergy',it:'Ha un\'allergia alle piante.',en:'Has an allergy to plants.',ok:false},
+ {k:'tennis',it:'Gioca a tennis con un amico.',en:'Plays tennis with a friend.',ok:false},
+ {k:'film',it:'Vuole fare un film.',en:'Wants to make a film.',ok:false}
+];
+
+var SOL={
+ it:[
+  'La colpevole è [Aurora Belgrano|Aurora Belgrano].',
+  'Aurora pensa che vendere sia un errore. Conosce la pianta di cicuta nella serra e compra un libro su Socrate.',
+  'Alle 14:45 Aurora telefona a Vittorio: «In cantina si rompono delle bottiglie!» Vittorio lascia la cucina. Aurora entra e mette la cicuta nel barattolo della tisana.',
+  'Aurora scrive un biglietto con il codice dei segni: SERRA ORE 15. Solo la Contessa lo capisce. Maria serve la tisana e Aurora è con la Contessa. Quando arrivano i primi sintomi, Aurora scappa dalla porta sul retro.',
+  'La Contessa capisce che è stata Aurora. Chiude la mano a pugno: la lettera A. Ascanio ha un nome con la A, ma ha un alibi: è in salotto con Filippo. Aurora è l\'unica senza alibi.'
+ ],
+ en:[
+  'The culprit is Aurora Belgrano.',
+  'Aurora thinks selling is a mistake. She knows the hemlock plant in the greenhouse and buys a book about Socrates.',
+  'At 14:45 Aurora phones Vittorio: “Some bottles are breaking in the cellar!” Vittorio leaves the kitchen. Aurora goes in and puts the hemlock in the tea jar.',
+  'Aurora writes a note in the sign code: GREENHOUSE 3 PM. Only the Countess understands it. Maria serves the tea and Aurora is with the Countess. When the first symptoms arrive, Aurora runs away through the back door.',
+  'The Countess understands that Aurora did it. She makes a fist: the letter A. Ascanio has a name with an A, but he has an alibi: he is in the living room with Filippo. Aurora is the only one without an alibi.'
+ ]
+};
+
+var MAPSVG='<svg viewBox="0 0 320 250" role="img" aria-label="Mappa di Villa Rufina: 1 villa, 2 campo da tennis, 3 serra, 4 vigneto" style="width:100%;height:auto;display:block;border-radius:4px">'+
+ '<rect width="320" height="250" fill="#6B8F5A"/>'+
+ '<g stroke="#3F6A3A" stroke-width="5" stroke-linecap="round" fill="none"><path d="M16 22h288M16 40h288M16 58h288M16 76h288M16 94h288"/></g>'+
+ '<path d="M160 100v150" stroke="#E8E2CF" stroke-width="14"/><path d="M160 150h130" stroke="#E8E2CF" stroke-width="10"/>'+
+ '<rect x="40" y="108" width="80" height="48" fill="#C0504D" stroke="#2E5A2E" stroke-width="5"/>'+
+ '<rect x="190" y="104" width="86" height="40" fill="#7FB5D6" stroke="#2E5A2E" stroke-width="3"/>'+
+ '<rect x="95" y="180" width="140" height="52" fill="#8B3A3A"/><rect x="70" y="190" width="28" height="32" fill="#7A3030"/>'+
+ '<g font-family="sans-serif" font-size="15" font-weight="700" text-anchor="middle"><circle cx="165" cy="172" r="12" fill="#fff"/><text x="165" y="177" fill="#15202B">1</text>'+
+ '<circle cx="80" cy="132" r="12" fill="#fff"/><text x="80" y="137" fill="#15202B">2</text>'+
+ '<circle cx="233" cy="124" r="12" fill="#fff"/><text x="233" y="129" fill="#15202B">3</text>'+
+ '<circle cx="160" cy="62" r="12" fill="#fff"/><text x="160" y="67" fill="#15202B">4</text></g></svg>';
+
+var META={
+ key:'giallo-villa-rufina-v1',
+ title:'Delitto a Villa Rufina',
+ setupH:'Chi ha ucciso la Contessa?',
+ culprit:'aurora',
+ victim:{init:'C',name:'Contessa Carlotta Ricci',it:'La capo di Villa Rufina. È anziana.',en:'The head of Villa Rufina. She is elderly.',color:'#55616B'},
+ inspector:{init:'V',name:'Vicequestore Volponi',it:'44 anni · polizia di Forte dei Venti',en:'44 · deputy police chief of Forte dei Venti. He leads the investigation.'},
+ suspectsLine:'Ora guardate i [sospetti|suspects]: sono nove.',
+ suspectsSub:'Nove persone. Chi è il colpevole? / Nine people. Who is the culprit?',
+ noteExIt:'Esempio: Ludovica ha un alibi? Se sì, tocca Sì nella colonna Alibi.',
+ noteExEn:'Example: does Ludovica have an alibi? If yes, tap Yes in the Alibi column.',
+ solProofs:[['Aurora non ha un alibi.','Aurora has no alibi.'],['Il suo nome inizia con A, come il pugno della Contessa.','Her name starts with A, like the Countess\'s fist.'],['Aurora telefona al cuoco e la cucina è libera.','Aurora phones the cook and the kitchen is free.']],
+ teacher:'Aurora Belgrano. Nessun alibi, nome con A (pugno = lettera A; Ascanio ha un alibi), telefona al cuoco alle 14:45 e mette la cicuta nel barattolo. Vittorio ha un\'allergia alle piante; Sofia ha un alibi (fisioterapista); Maria, Giada, Ludovica, Guglielmo, Filippo e Ascanio hanno testimoni.',
+ caso:'<div class="card"><div class="card-h"><span class="tag">Mappa</span></div>'+MAPSVG+'<p lang="it"><b>1</b> Villa · <b>2</b> Campo da tennis · <b>3</b> Serra · <b>4</b> Vigneto</p><small lang="en">1 Villa · 2 Tennis court · 3 Greenhouse · 4 Vineyard</small></div>'
+};
+
+var DECK=[{t:'story'},{t:'map'},{t:'cast',ids:['filippo','giada']},{t:'cast',ids:['ascanio','ludovica']},{t:'cast',ids:['maria','vittorio']},{t:'cast',ids:['guglielmo','aurora','sofia']},
+{t:'clue',id:'2.1'},{t:'clue',id:'3.1'},{t:'clue',id:'3.2'},{t:'clue',id:'3.3'},
+{t:'clue',id:'2.2'},{t:'clue',id:'2.3'},{t:'clue',id:'2.4'},{t:'clue',id:'2.5'},{t:'clue',id:'2.6'},{t:'clue',id:'2.7'},{t:'clue',id:'2.8'},
+{t:'clue',id:'3.4'},{t:'clue',id:'3.5'},{t:'clue',id:'3.6'},
+{t:'puzzle',it:'Enigma: Nel poster dei segni, che lettera è il pugno chiuso?',en:'Puzzle: On the sign language poster, which letter is the closed fist?',ans:['a']},
+{t:'clue',id:'3.7'},{t:'clue',id:'3.8'},{t:'clue',id:'4.1'},{t:'clue',id:'4.2'},
+{t:'puzzle',it:'Enigma: Alle 14:45 Vittorio lascia la cucina. Alle 15:10 Maria porta le tazze in serra. Quanti minuti passano?',en:'Puzzle: At 14:45 Vittorio leaves the kitchen. At 15:10 Maria takes the cups to the greenhouse. How many minutes pass?',ans:['25']},
+{t:'clue',id:'4.3'},{t:'clue',id:'4.4'},{t:'clue',id:'4.5'},{t:'clue',id:'4.6'},{t:'clue',id:'4.7'},{t:'clue',id:'4.8'},{t:'clue',id:'4.9'},
+{t:'clue',id:'3.9'},{t:'clue',id:'3.10'},{t:'clue',id:'4.10'},{t:'clue',id:'4.11'},
+{t:'final',it:'Il vicequestore Volponi ha tutti gli elementi per [accusare|accuse] il colpevole, anche grazie alle vostre idee. Ora leggete la soluzione.',en:'Deputy Police Chief Volponi has everything he needs to accuse the culprit, also thanks to your ideas. Now read the solution.'}];
+
+/* ---------- state ---------- */
+var KEY=META.key;
+var S={mode:'split',deck:null,n:1,me:1,started:false,unlocked:1,en:false,marks:{},attempts:0,solved:false,revealed:false};
+try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);for(var k in o){S[k]=o[k]}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+var tab='caso',round=2,pend='',openEn={},selSus='',selProofs={},hintShown=false,teacherOpen=false,resHtml='';
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function mk(s){return esc(s).replace(/\[([^|\]]+)\|([^\]]+)\]/g,function(m,a,b){return '<button type="button" class="w" data-act="w" data-t="'+b+'">'+a+'</button>'})}
+function plain(s){return s.replace(/\[([^|\]]+)\|([^\]]+)\]/g,'$1')}
+function owner(i){return (i%S.n)+1}
+function myClues(r){var out=[];CLUES.forEach(function(c,i){if(c.r===r&&owner(i)===S.me)out.push(c)});return out}
+function cardHtml(id,tag,title,it,en){
+  var open=S.en||openEn[id];
+  var its=(Array.isArray(it)?it:[it]).map(function(p){return '<p class="it" lang="it">'+mk(p)+'</p>'}).join('');
+  var ens=(Array.isArray(en)?en:[en]).map(function(p){return '<p lang="en">'+esc(p)+'</p>'}).join('');
+  return '<article class="card" data-id="'+id+'"><div class="card-h"><span class="tag">'+tag+'</span>'+
+    (TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'')+'</div>'+
+    (title?'<h3>'+esc(title)+'</h3>':'')+its+'<div class="gloss" hidden aria-live="polite"></div>'+
+    '<button type="button" class="entog" data-act="ent" aria-expanded="'+(open?'true':'false')+'">English</button>'+
+    '<div class="en" '+(open?'':'hidden')+'>'+ens+'</div></article>';
+}
+function bi(it,en){return '<span lang="it">'+esc(it)+'</span><small lang="en">'+esc(en)+'</small>'}
+
+/* ---------- views ---------- */
+function header(){
+  return '<header class="top"><div class="tape"></div><div class="wrap top-row"><div class="brand"><h1>'+esc(META.title)+'</h1><span>Giallo in italiano · A1–A2</span></div>'+
+   '<button type="button" class="pill" data-act="en" aria-pressed="'+(S.en?'true':'false')+'" aria-label="Mostra sempre inglese / Always show English">EN</button>'+
+   '<button type="button" class="pill" data-act="glos" aria-label="Parole / Glossary">Aa</button></div></header>';
+}
+function nav(){
+  var T=[['caso','Caso','Case'],['indizi','Indizi','Clues'],['sospetti','Sospetti','Suspects'],['taccuino','Taccuino','Notebook'],['accusa','Accusa','Accuse']];
+  return '<nav class="nav" aria-label="Menu"><div class="nav-in">'+T.map(function(t){
+    return '<button type="button" class="tab" data-act="tab" data-v="'+t[0]+'"'+(tab===t[0]?' aria-current="page"':'')+'>'+t[1]+'<small>'+t[2]+'</small></button>'}).join('')+'</div></nav>';
+}
+function viewSetup(){
+  if(S.mode==='deck')return deckSetup();
+  var chips='';for(var i=1;i<=10;i++)chips+='<button type="button" class="chip" data-act="n" data-v="'+i+'" aria-pressed="'+(S.n===i)+'">'+i+'</button>';
+  var me='';for(var j=1;j<=10;j++)me+='<button type="button" class="chip" data-act="me" data-v="'+j+'" aria-pressed="'+(S.me===j)+'"'+(j>S.n?' disabled':'')+'>'+j+'</button>';
+  return '<div class="stack"><h2>'+esc(META.setupH)+'</h2>'+
+   '<p class="it" lang="it">Un giallo da risolvere insieme. Ogni giocatore apre questo link sul suo telefono.</p>'+
+   '<p class="en" lang="en">A mystery to solve together. Each player opens this link on their own phone.</p></div>'+
+   modeChooser()+'<section class="stack"><div class="q" lang="it">Quanti giocatori siete?<small lang="en">How many players are you? (1–10)</small></div><div class="chips">'+chips+'</div></section>'+
+   '<section class="stack"><div class="q" lang="it">Il tuo numero<small lang="en">Your number. Each person chooses a different number.</small></div><div class="chips">'+me+'</div></section>'+
+   '<button type="button" class="btn tape" data-act="start">Inizia<small>Start</small></button>'+
+   '<button type="button" class="link" data-act="teacher">Per l\'insegnante / For the teacher</button>'+
+   (teacherOpen?teacherHtml():'');
+}
+function teacherHtml(){
+  var rows=CLUES.map(function(c,i){return '<tr><td class="c">'+c.id+'</td><td>'+esc(c.t)+'</td><td class="c">'+owner(i)+'</td></tr>'}).join('');
+  return '<div class="card"><h3>Distribuzione indizi / Clue distribution</h3><small>Con '+S.n+' giocatori / With '+S.n+' players</small>'+
+   '<div class="tw"><table class="tt"><thead><tr><th>#</th><th>Indizio</th><th>Giocatore</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+   '<h3>Soluzione / Solution</h3><p>'+esc(META.teacher)+'</p>'+
+   '<small>Consiglio: 5 minuti per Round. Ogni studente legge ad alta voce, poi tutti riassumono in una frase. / Tip: 5 minutes per round. Each student reads aloud, then everyone summarises in one sentence.</small></div>';
+}
+function viewCaso(){
+  var h='<h2>Il caso</h2>'+cardHtml('story','Round 1 · La storia','',STORY.it,STORY.en);
+  h+='<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+RULES.map(function(r){return '<li>'+mk(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>';
+  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who"><div class="av" style="background:'+META.victim.color+'" aria-hidden="true">'+META.victim.init+'</div><div><b>'+esc(META.victim.name)+'</b><span lang="it">'+esc(META.victim.it)+'</span><small lang="en" style="display:block">'+esc(META.victim.en)+'</small></div></div></div>';
+  h+=META.caso||'';
+  h+='<p lang="it">'+mk(META.suspectsLine)+'</p>';
+  if(S.unlocked<2){h+=confirmBtn('unlock','2','Siamo pronti: Round 2','We are ready: Round 2')}
+  else h+='<button type="button" class="btn tape" data-act="tab" data-v="indizi">Vai agli indizi<small>Go to the clues</small></button>';
+  h+='<button type="button" class="link" data-act="restart">Cambia giocatore / Change player</button>';
+  return h;
+}
+function confirmBtn(act,v,it,en){
+  var on=pend===act+v;
+  return '<button type="button" class="btn tape" data-act="'+act+'" data-v="'+v+'">'+(on?'Tocca ancora per confermare':esc(it))+'<small>'+(on?'Tap again to confirm':esc(en))+'</small></button>';
+}
+function viewIndizi(){
+  var rd='';[2,3,4].forEach(function(r){
+    var lock=r>S.unlocked;
+    rd+='<button type="button" class="rd" data-act="round" data-v="'+r+'" aria-pressed="'+(round===r)+'" aria-disabled="'+lock+'">'+(lock?LOCK:'')+'<span>'+r+' · '+ROUNDS[r].t+'</span></button>';
+  });
+  var R=ROUNDS[round];
+  var mine=myClues(round);
+  var h='<h2>Round '+round+'</h2><small>Giocatore '+S.me+' di '+S.n+' · Player '+S.me+' of '+S.n+'</small><div class="rounds">'+rd+'</div>';
+  if(round>S.unlocked){return h+'<p lang="it">Questo round è [bloccato|locked]. Tornate al Round '+S.unlocked+'.</p>'}
+  h+='<div class="task"><p class="it" lang="it">'+mk(R.task)+'</p><p class="en" lang="en" style="border:0;padding-top:4px">'+esc(R.taskEn)+'</p></div>';
+  if(mine.length){
+    h+='<h3 lang="it" style="margin-top:4px">I tuoi indizi ('+mine.length+')</h3>';
+    mine.forEach(function(c){h+=cardHtml(c.id,'Indizio '+c.id,c.t,c.it,c.en)});
+  }else{
+    h+='<div class="card"><p class="it" lang="it">Nessun indizio per te in questo round. Ascolta gli altri e fai domande.</p><p class="en" lang="en">No clue for you in this round. Listen to the others and ask questions.</p></div>';
+  }
+  var q=QUESTIONS[round][(S.me-1)%QUESTIONS[round].length];
+  h+='<div class="card ask"><div class="card-h"><span class="tag">La tua domanda</span></div><p class="it" lang="it">Chiedi al gruppo: <b>'+esc(q[0])+'</b></p><p class="en" lang="en" style="border:0;padding:0">Ask the group: '+esc(q[1])+'</p></div>';
+  if(round<4){
+    if(S.unlocked>round)h+='<button type="button" class="btn tape" data-act="round" data-v="'+(round+1)+'">Round '+(round+1)+'<small>Next round</small></button>';
+    else h+=confirmBtn('unlock',String(round+1),'Siamo pronti: Round '+(round+1),'We are ready: Round '+(round+1));
+  }else{
+    h+='<button type="button" class="btn tape" data-act="tab" data-v="accusa">Pronti ad accusare<small>Ready to accuse</small></button>';
+  }
+  return h;
+}
+function viewSospetti(){
+  var h='<h2>I sospetti</h2><small>'+esc(META.suspectsSub)+'</small>';
+  h+='<div class="card"><div class="who"><div class="av" style="background:#34495E" aria-hidden="true">'+META.inspector.init+'</div><div><b>'+esc(META.inspector.name)+'</b><span lang="it">'+esc(META.inspector.it.split(' · ')[1]||'')+'</span><small lang="en" style="display:block">'+esc(META.inspector.en)+'</small></div></div></div>';
+  CAST.forEach(function(c){
+    h+='<article class="card" data-id="s-'+c.id+'"><div class="who"><div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div><div><b>'+c.name+'</b><span lang="it">'+c.age+' anni · '+c.role+'</span><small lang="en" style="display:block">'+c.age+' · '+esc(c.roleEn)+'</small></div></div>'+
+     '<p class="it" lang="it">'+mk(c.desc)+'</p><div class="gloss" hidden></div><p class="en" lang="en" '+(S.en?'':'hidden')+'>'+esc(c.descEn)+'</p></article>';
+  });
+  return h;
+}
+function viewNote(){
+  var h='<h2>Il taccuino</h2><p lang="it">Tocca una casella: <b>?</b> → <b>Sì</b> → <b>No</b>.</p><small lang="en">Tap a box: ? (not sure) → Yes → No.</small>';
+  h+='<div class="tw"><table class="nb"><thead><tr><th scope="col">'+bi('Sospetto','Suspect')+'</th>'+COLS.map(function(c){return '<th scope="col">'+bi(c.it,c.en)+'</th>'}).join('')+'</tr></thead><tbody>';
+  CAST.forEach(function(c){
+    h+='<tr><th scope="row">'+esc(c.name.split(' ')[0])+'<small>'+esc(c.roleEn)+'</small></th>';
+    COLS.forEach(function(col){
+      var v=(S.marks[c.id]&&S.marks[c.id][col.k])||'';
+      h+='<td><button type="button" class="cell '+v+'" data-act="mark" data-s="'+c.id+'" data-k="'+col.k+'" aria-label="'+esc(c.name+', '+col.it)+': '+(v==='y'?'Sì':v==='n'?'No':'?')+'">'+(v==='y'?'Sì':v==='n'?'No':'?')+'</button></td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="card"><p class="it" lang="it">'+esc(META.noteExIt)+'</p><p class="en" lang="en">'+esc(META.noteExEn)+'</p></div>';
+  h+=confirmBtnGhost('resetnb','x','Cancella il taccuino','Clear the notebook');
+  return h;
+}
+function confirmBtnGhost(act,v,it,en){
+  var on=pend===act+v;
+  return '<button type="button" class="btn ghost" data-act="'+act+'" data-v="'+v+'">'+(on?'Tocca ancora':esc(it))+'<small>'+(on?'Tap again':esc(en))+'</small></button>';
+}
+function viewAccusa(){
+  if(S.solved||S.revealed)return viewSol();
+  var h='<h2>Accusa</h2><p class="it" lang="it">Chi è il colpevole? Scegliete insieme una persona e tre prove.</p><p class="en" lang="en">Who is the culprit? Choose one person and three proofs together.</p>';
+  h+='<fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="q" lang="it" style="padding:0 0 8px">1. Il colpevole<small lang="en">The culprit</small></legend>';
+  CAST.forEach(function(c){h+='<label class="opt"><input type="radio" name="sus" data-act="pick" value="'+c.id+'"'+(selSus===c.id?' checked':'')+'><span><b>'+c.name+'</b><span class="e">'+esc(c.roleEn)+'</span></span></label>'});
+  h+='</fieldset><fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="q" lang="it" style="padding:0 0 8px">2. Tre prove<small lang="en">Three proofs</small></legend>';
+  PROOFS.forEach(function(p){h+='<label class="opt"><input type="checkbox" data-act="proof" value="'+p.k+'"'+(selProofs[p.k]?' checked':'')+'><span lang="it">'+esc(p.it)+'<span class="e" lang="en">'+esc(p.en)+'</span></span></label>'});
+  h+='</fieldset><div id="res" aria-live="polite">'+resHtml+'</div>';
+  h+='<button type="button" class="btn tape" data-act="accuse">Accuso!<small>I accuse!</small></button>';
+  if(S.attempts>=2&&!hintShown)h+='<button type="button" class="btn ghost" data-act="hint">Un aiuto<small>A hint</small></button>';
+  if(hintShown)h+='<div class="card"><p class="it" lang="it">Aiuto: Chi ha una chiave? Chi non ha un alibi? Chi sa come muore Rosa?</p><p class="en" lang="en">Hint: Who has a key? Who has no alibi? Who knows how Rosa dies?</p></div>';
+  if(S.attempts>=3)h+=confirmBtnGhost('reveal','x','Mostra la soluzione','Show the solution');
+  return h;
+}
+function viewSol(){
+  var h='<span class="stamp">Caso chiuso</span><h2>La soluzione</h2>'+cardHtml('sol','Soluzione','',SOL.it,SOL.en);
+  h+='<div class="card"><div class="card-h"><span class="tag">Le prove</span></div><ol class="steps">'+META.solProofs.map(function(p){return '<li>'+esc(p[0])+'<span lang="en">'+esc(p[1])+'</span></li>'}).join('')+'</ol></div>';
+  h+='<button type="button" class="btn tape" data-act="again">Gioca ancora<small>Play again</small></button>';
+  return h;
+}
+function glossaryData(){
+  var map={};var texts=[].concat(STORY.it,SOL.it);
+  RULES.forEach(function(r){texts.push(r[0])});
+  CLUES.forEach(function(c){texts.push(c.it)});
+  Object.keys(ROUNDS).forEach(function(k){texts.push(ROUNDS[k].task)});
+  CAST.forEach(function(c){texts.push(c.desc)});
+  texts.push(META.suspectsLine);
+  texts.forEach(function(t){var re=/\[([^|\]]+)\|([^\]]+)\]/g,m;while((m=re.exec(t))){var k=m[1].toLowerCase();if(!map[k])map[k]=[m[1],m[2]]}});
+  return Object.keys(map).sort(function(a,b){return a.localeCompare(b,'it')}).map(function(k){return map[k]});
+}
+var GL=null;
+function openGlossary(){
+  if(!GL)GL=glossaryData();
+  var el=$('#gl');
+  el.innerHTML='<div class="wrap"><div class="row" style="justify-content:space-between;align-items:center"><h2>Parole</h2><button type="button" class="pill" data-act="closeglos">Chiudi</button></div><small>Glossario italiano → inglese / Italian → English glossary</small><input type="search" id="gs" placeholder="Cerca / Search" aria-label="Cerca / Search"><div id="gl-list">'+glList('')+'</div></div>';
+  el.hidden=false;
+  document.body.style.overflow='hidden';
+}
+function glList(q){
+  q=q.toLowerCase();
+  var items=GL.filter(function(p){return !q||p[0].toLowerCase().indexOf(q)>-1||p[1].toLowerCase().indexOf(q)>-1});
+  if(!items.length)return '<p>Nessun risultato / No results</p>';
+  return items.map(function(p){return '<div class="gl-item"><b lang="it">'+esc(p[0])+'</b><span lang="en">'+esc(p[1])+'</span></div>'}).join('');
+}
+
+function render(){
+  if(S.mode==='deck'){
+    if(S.deck&&S.deck.started){renderDeck();return}
+    $('#app').innerHTML=header()+'<main class="wrap main">'+viewSetup()+'</main>';return;
+  }
+  var body;
+  if(!S.started)body=viewSetup();
+  else body=({caso:viewCaso,indizi:viewIndizi,sospetti:viewSospetti,taccuino:viewNote,accusa:viewAccusa})[tab]();
+  $('#app').innerHTML=header()+'<main class="wrap main">'+body+'</main>'+(S.started?nav():'');
+}
+function go(t){tab=t;pend='';render();window.scrollTo(0,0)}
+
+/* ---------- speech ---------- */
+function speak(card,btn){
+  if(!TTS)return;
+  try{
+    var ss=window.speechSynthesis;
+    if(btn.getAttribute('aria-pressed')==='true'){ss.cancel();btn.setAttribute('aria-pressed','false');return}
+    ss.cancel();
+    $$('.ico[aria-pressed="true"]').forEach(function(b){b.setAttribute('aria-pressed','false')});
+    var txt=$$('.it',card).map(function(n){return n.textContent}).join(' ');
+    var u=new SpeechSynthesisUtterance(txt);u.lang='it-IT';u.rate=0.85;
+    var v=ss.getVoices().filter(function(x){return /^it/i.test(x.lang)})[0];if(v)u.voice=v;
+    btn.setAttribute('aria-pressed','true');
+    u.onend=u.onerror=function(){btn.setAttribute('aria-pressed','false')};
+    ss.speak(u);
+  }catch(e){btn.setAttribute('aria-pressed','false')}
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-act]');
+  if(!b||b.tagName==='INPUT')return;
+  var a=b.getAttribute('data-act'),v=b.getAttribute('data-v');
+  var keep=(a==='unlock'||a==='resetnb'||a==='reveal'||a==='teacher'||a==='dmenu');
+  if(!keep&&pend){pend=''}
+  switch(a){
+   case 'n':S.n=+v;if(S.me>S.n)S.me=S.n;save();render();break;
+   case 'me':S.me=+v;save();render();break;
+   case 'start':S.started=true;tab='caso';save();render();window.scrollTo(0,0);break;
+   case 'restart':S.started=false;save();render();window.scrollTo(0,0);break;
+   case 'tab':go(v);break;
+   case 'round':if(+v<=S.unlocked){round=+v;pend='';render();window.scrollTo(0,0)}break;
+   case 'unlock':
+     if(pend==='unlock'+v){S.unlocked=Math.max(S.unlocked,+v);round=+v;pend='';save();tab='indizi';render();window.scrollTo(0,0)}
+     else{pend='unlock'+v;render()}
+     break;
+   case 'en':S.en=!S.en;save();render();break;
+   case 'glos':openGlossary();break;
+   case 'closeglos':$('#gl').hidden=true;document.body.style.overflow='';break;
+   case 'w':
+     var card=b.closest('.card'),g=$('.gloss',card);
+     if(g){g.textContent=b.textContent+' = '+b.getAttribute('data-t');g.hidden=false}
+     break;
+   case 'ent':
+     var c2=b.closest('.card'),id=c2.getAttribute('data-id'),en=$('.en',c2);
+     var open=en.hidden;en.hidden=!open;openEn[id]=open;b.setAttribute('aria-expanded',open?'true':'false');
+     break;
+   case 'say':speak(b.closest('.card'),b);break;
+   case 'mark':
+     var s=b.getAttribute('data-s'),k=b.getAttribute('data-k');
+     S.marks[s]=S.marks[s]||{};
+     var cur=S.marks[s][k]||'',nx=cur===''?'y':cur==='y'?'n':'';
+     S.marks[s][k]=nx;save();
+     b.className='cell '+nx;b.textContent=nx==='y'?'Sì':nx==='n'?'No':'?';
+     break;
+   case 'resetnb':
+     if(pend==='resetnbx'){S.marks={};pend='';save();render()}else{pend='resetnbx';render()}
+     break;
+   case 'accuse':doAccuse();break;
+   case 'hint':hintShown=true;render();break;
+   case 'reveal':
+     if(pend==='revealx'){S.revealed=true;pend='';save();render();window.scrollTo(0,0)}else{pend='revealx';render()}
+     break;
+   case 'again':
+     S.marks={};S.attempts=0;S.solved=false;S.revealed=false;S.unlocked=1;S.started=false;
+     selSus='';selProofs={};hintShown=false;resHtml='';openEn={};tab='caso';round=2;save();render();window.scrollTo(0,0);
+     break;
+   case 'teacher':
+     if(pend==='teacherx'){teacherOpen=!teacherOpen;pend=''}else{pend='teacherx';if(teacherOpen)teacherOpen=false}
+     render();
+     break;
+  }
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target;if(!t||!t.getAttribute)return;
+  var a=t.getAttribute('data-act');
+  if(a==='pick')selSus=t.value;
+  if(a==='proof')selProofs[t.value]=t.checked;
+});
+document.addEventListener('input',function(ev){
+  if(ev.target&&ev.target.id==='gs'&&GL){$('#gl-list').innerHTML=glList(ev.target.value)}
+});
+
+function doAccuse(){
+  var picked=Object.keys(selProofs).filter(function(k){return selProofs[k]});
+  var box=$('#res');
+  if(!selSus||picked.length!==3){
+    box.innerHTML='<div class="msg" role="alert"><span lang="it">Scegliete una persona e tre prove.</span><span class="e" lang="en">Choose one person and three proofs.</span></div>';
+    return;
+  }
+  var okProofs=picked.every(function(k){return PROOFS.filter(function(p){return p.k===k})[0].ok});
+  if(selSus===META.culprit&&okProofs){S.solved=true;save();render();window.scrollTo(0,0);return}
+  S.attempts++;save();
+  resHtml='<div class="msg" role="alert"><span lang="it">Non ancora. Il colpevole o le prove non sono giusti. Guardate il taccuino.</span><span class="e" lang="en">Not yet. The culprit or the proofs are not right. Look at the notebook.</span></div>';
+  render();
+  var r=$('#res');if(r)r.scrollIntoView({block:'center'});
+}
+
+/* ---------- deck mode ---------- */
+var selDP=-1,selDS='',dEx='',dMsg=null;
+function newDeck(){return {n:1,names:[],expert:false,started:false,idx:0,turn:0,g:{},fin:false,puz:{},tab:'carte'}}
+function dk(){if(!S.deck)S.deck=newDeck();return S.deck}
+function pname(p){var d=dk();var s=(d.names[p]||'').replace(/^\s+|\s+$/g,'');return s||('Giocatore '+(p+1))}
+function firstClue(){for(var i=0;i<DECK.length;i++){if(DECK[i].t==='clue')return i}return DECK.length}
+function clueById(id){for(var i=0;i<CLUES.length;i++){if(CLUES[i].id===id)return CLUES[i]}return null}
+function castById(id){for(var i=0;i<CAST.length;i++){if(CAST[i].id===id)return CAST[i]}return null}
+function deckTitle(i){var it=DECK[i];if(it.t==='clue')return clueById(it.id).t;return {story:'La storia',map:'Mappa',cast:'Personaggi',puzzle:'Enigma',final:'Fine'}[it.t]}
+function norm(s){return String(s).toLowerCase().replace(/\s+/g,'').replace(/[.,h]/g,':').replace(/^0+(?=\d)/,'')}
+var SPKBTN=TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'';
+
+function headBlock(){
+  return '<div class="stack"><h2>'+esc(META.setupH)+'</h2><p class="it" lang="it">Un giallo da risolvere. Pescate le carte, leggete gli indizi e trovate il colpevole.</p><p class="en" lang="en">A mystery to solve. Draw the cards, read the clues and find the culprit.</p></div>';
+}
+function modeChooser(){
+  var deck=S.mode==='deck';
+  return '<section class="stack"><div class="q" lang="it">Come giocate?<small lang="en">How do you play?</small></div><div class="rounds" style="grid-template-columns:1fr 1fr">'+
+   '<button type="button" class="rd" data-act="mode" data-v="split" aria-pressed="'+(!deck)+'" style="flex-direction:column;text-transform:none"><span>Una squadra</span><small style="color:inherit">Everyone has a phone</small></button>'+
+   '<button type="button" class="rd" data-act="mode" data-v="deck" aria-pressed="'+deck+'" style="flex-direction:column;text-transform:none"><span>Il mazzo</span><small style="color:inherit">One phone, or play alone</small></button></div></section>';
+}
+function deckSetup(){
+  var d=dk(),chips='',i;
+  for(i=1;i<=10;i++)chips+='<button type="button" class="chip" data-act="dn" data-v="'+i+'" aria-pressed="'+(d.n===i)+'">'+i+'</button>';
+  var names='';
+  if(d.n>1)for(i=0;i<d.n;i++)names+='<input class="txt" id="dname'+i+'" type="text" maxlength="20" value="'+esc(d.names[i]||'')+'" placeholder="Giocatore '+(i+1)+'" aria-label="Nome del giocatore '+(i+1)+'">';
+  var rules=[['A turno, pesca una carta e leggila a voce alta.','In turn, draw a card and read it out loud.'],['Scrivi le tue idee nel taccuino.','Write your ideas in the notebook.'],['Quando sai chi è il colpevole, tocca «Ipotesi». Hai due tentativi: la seconda ipotesi annulla la prima.','When you know who the culprit is, tap “Guess”. You have two attempts: the second guess cancels the first.'],['Prima dell\'ultima carta, tutti devono fare un\'ipotesi.','Before the last card, everyone must make a guess.'],['Vince chi indovina con la carta più bassa.','The winner is whoever guesses right with the lowest card number.']];
+  return headBlock()+modeChooser()+
+   '<section class="stack"><div class="q" lang="it">Quanti giocatori siete?<small lang="en">How many players are you? (1 = play alone)</small></div><div class="chips">'+chips+'</div>'+
+   (names?'<div class="q" lang="it">I nomi<small lang="en">Names (optional)</small></div><div class="stack">'+names+'</div>':'')+'</section>'+
+   '<label class="opt"><input type="checkbox" data-act="dexp"'+(d.expert?' checked':'')+'><span lang="it">Versione per esperti: scrivi una breve spiegazione con l\'ipotesi.<span class="e" lang="en">Expert version: write a short explanation with your guess.</span></span></label>'+
+   '<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+rules.map(function(r){return '<li>'+esc(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>'+
+   '<button type="button" class="btn tape" data-act="dstart">Inizia<small>Start</small></button>'+
+   '<button type="button" class="link" data-act="teacher">Per l\'insegnante / For the teacher</button>'+(teacherOpen?'<div class="card"><h3>Soluzione / Solution</h3><p>'+esc(META.teacher)+'</p></div>':'');
+}
+function castCard(i,it){
+  var open=S.en||openEn['d-'+i],its='',ens='';
+  it.ids.forEach(function(id){var c=castById(id);
+    its+='<div class="who"><div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div><div><b>'+esc(c.name)+'</b><span lang="it">'+c.age+' anni · '+esc(c.role)+'</span></div></div><p class="it" lang="it">'+mk(c.desc)+'</p>';
+    ens+='<p lang="en"><b>'+esc(c.name)+'</b>: '+c.age+', '+esc(c.roleEn)+'. '+esc(c.descEn)+'</p>';});
+  return '<article class="card" data-id="d-'+i+'"><div class="card-h"><span class="tag">Carta '+(i+1)+' · Personaggi</span>'+SPKBTN+'</div>'+its+'<div class="gloss" hidden></div><button type="button" class="entog" data-act="ent" aria-expanded="'+(open?'true':'false')+'">English</button><div class="en" '+(open?'':'hidden')+'>'+ens+'</div></article>';
+}
+function deckCardHtml(i){
+  var it=DECK[i],d=dk(),tag='Carta '+(i+1);
+  if(it.t==='story')return cardHtml('d-'+i,tag+' · La storia','',STORY.it,STORY.en);
+  if(it.t==='map')return META.caso||'';
+  if(it.t==='cast')return castCard(i,it);
+  if(it.t==='clue'){var c=clueById(it.id);return cardHtml('d-'+i,tag+' · Indizio',c.t,c.it,c.en)}
+  if(it.t==='final')return cardHtml('d-'+i,tag+' · Fine','',it.it,it.en);
+  if(it.t==='puzzle'){
+    var h=cardHtml('d-'+i,tag+' · Enigma','',it.it,it.en);
+    var ex='<div class="row" style="flex-wrap:nowrap"><input class="txt" id="pz'+i+'" type="text" autocomplete="off" placeholder="Risposta / Answer" aria-label="Risposta"><button type="button" class="btn ghost" data-act="pz" data-v="'+i+'" style="flex:none">Controlla</button></div><div id="pzr'+i+'" aria-live="polite">'+(d.puz[i]?'<b>Esatto! / Correct!</b>':'')+'</div>';
+    return h.replace(/<\/article>$/,ex+'</article>');
+  }
+  return '';
+}
+function deckCarte(){
+  var d=dk(),N=DECK.length,h='<h2>Le carte</h2>';
+  h+='<div><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="'+N+'" aria-valuenow="'+d.idx+'"><i style="width:'+Math.round(d.idx/N*100)+'%"></i></div><small>Carta '+d.idx+' di '+N+' · Card '+d.idx+' of '+N+'</small></div>';
+  if(d.idx===0)h+='<div class="card"><p class="it" lang="it">Il mazzo è pronto. Pesca la prima carta e leggila a voce alta.</p><p class="en" lang="en">The deck is ready. Draw the first card and read it out loud.</p></div>';
+  else h+=deckCardHtml(d.idx-1);
+  var nx=DECK[d.idx];
+  if(nx){
+    var missing=[];
+    if(nx.t==='final'){for(var p=0;p<d.n;p++){if(!(d.g[p]&&d.g[p].att>0))missing.push(pname(p))}}
+    if(missing.length){
+      h+='<div class="card ask"><p class="it" lang="it">Prima dell\'ultima carta, tutti devono fare un\'ipotesi. Mancano: <b>'+esc(missing.join(', '))+'</b>.</p><p class="en" lang="en">Before the last card, everyone must make a guess. Still missing: '+esc(missing.join(', '))+'.</p></div>';
+      h+='<button type="button" class="btn tape" data-act="dtab" data-v="ipotesi">Fai l\'ipotesi<small>Make your guess</small></button>';
+    }else{
+      if(d.n>1)h+='<div class="turn"><span lang="it">Turno di <b>'+esc(pname(d.turn))+'</b></span><small lang="en">Draw the next card and read it aloud</small></div>';
+      h+='<button type="button" class="btn tape" data-act="ddraw">'+(nx.t==='final'?'Pesca l\'ultima carta':'Pesca la carta successiva')+'<small>'+(nx.t==='final'?'Draw the last card':'Draw the next card')+'</small></button>';
+    }
+  }
+  if(d.idx>=firstClue())h+='<button type="button" class="btn ghost" data-act="dtab" data-v="ipotesi">So chi è il colpevole!<small>I know who the culprit is!</small></button>';
+  if(d.idx>1){
+    h+='<h3 lang="it" style="margin-top:6px">Carte sul tavolo</h3>';
+    for(var i=d.idx-2;i>=0;i--)h+='<details class="old"><summary>Carta '+(i+1)+' · '+esc(deckTitle(i))+'</summary>'+deckCardHtml(i)+'</details>';
+  }
+  h+=confirmBtnGhost('dmenu','x','Torna al menu','Back to menu');
+  return h;
+}
+function deckIpotesi(){
+  var d=dk(),h='<h2>Ipotesi</h2>',p;
+  if(d.idx<firstClue())return h+'<div class="card"><p class="it" lang="it">Prima pescate le carte dei personaggi. Poi potete fare un\'ipotesi.</p><p class="en" lang="en">First draw the character cards. Then you can make a guess.</p></div>';
+  h+='<p class="it" lang="it">Hai due tentativi. La seconda ipotesi annulla la prima. Nessuno vede la tua risposta.</p><p class="en" lang="en">You have two attempts. The second guess cancels the first. Nobody sees your answer.</p>';
+  if(dMsg)h+='<div class="msg" role="status"><span lang="it">'+esc(dMsg[0])+'</span><span class="e" lang="en">'+esc(dMsg[1])+'</span></div>';
+  if(d.n===1)selDP=0;
+  else{
+    h+='<div class="stack"><div class="q" lang="it">Chi fa l\'ipotesi?<small lang="en">Who is guessing?</small></div>';
+    for(p=0;p<d.n;p++){var a=(d.g[p]&&d.g[p].att)||0;h+='<button type="button" class="rd" style="justify-content:space-between;padding:0 14px" data-act="dsel" data-v="'+p+'" aria-pressed="'+(selDP===p)+'" aria-disabled="'+(a>=2)+'"><span>'+esc(pname(p))+'</span><span>'+a+'/2</span></button>'}
+    h+='</div>';
+  }
+  if(selDP>=0){
+    var att=(d.g[selDP]&&d.g[selDP].att)||0;
+    if(att>=2)return h+'<div class="card"><p class="it" lang="it">'+esc(pname(selDP))+' ha finito i tentativi.</p><p class="en" lang="en">No attempts left.</p></div>';
+    if(att===1)h+='<div class="card ask"><p class="it" lang="it">Questa è la seconda ipotesi: annulla la prima.</p><p class="en" lang="en">This is the second guess: it cancels the first.</p></div>';
+    h+='<fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="q" lang="it" style="padding:0 0 8px">Il colpevole<small lang="en">The culprit</small></legend>';
+    CAST.forEach(function(c){h+='<label class="opt"><input type="radio" name="dsus" data-act="dsus" value="'+c.id+'"'+(selDS===c.id?' checked':'')+'><span><b>'+esc(c.name)+'</b><span class="e">'+esc(c.roleEn)+'</span></span></label>'});
+    h+='</fieldset>';
+    if(d.expert)h+='<div class="stack"><label class="q" for="dexpl" lang="it">La tua spiegazione<small lang="en">Your short explanation</small></label><textarea class="txt" id="dexpl" maxlength="400" placeholder="Perché?">'+esc(dEx)+'</textarea></div>';
+    h+='<button type="button" class="btn tape" data-act="dsave">Salva l\'ipotesi<small>Carta '+d.idx+' · Save guess</small></button>';
+  }
+  return h;
+}
+function deckRisultati(){
+  var d=dk(),h='<span class="stamp">Caso chiuso</span><h2>Risultati</h2>',p,fi=DECK.length-1;
+  h+=deckCardHtml(fi);
+  h+=cardHtml('sol','Soluzione','',SOL.it,SOL.en);
+  h+='<div class="card"><div class="card-h"><span class="tag">Le prove</span></div><ol class="steps">'+META.solProofs.map(function(x){return '<li>'+esc(x[0])+'<span lang="en">'+esc(x[1])+'</span></li>'}).join('')+'</ol></div>';
+  var best=1e9,win=[],rows='';
+  for(p=0;p<d.n;p++){var g=d.g[p];if(g&&g.sus===META.culprit){if(g.card<best){best=g.card;win=[p]}else if(g.card===best)win.push(p)}}
+  h+='<div class="card"><div class="card-h"><span class="tag">Chi vince?</span></div>';
+  if(win.length)h+='<p class="it" lang="it">'+(d.n>1?(win.length>1?'Vincono: ':'Vince: ')+'<b>'+esc(win.map(pname).join(', '))+'</b>':'<b>Bravo!</b> Hai trovato il colpevole')+' con la carta <b>'+best+'</b>.</p><p class="en" lang="en">'+(d.n>1?'Winner: '+esc(win.map(pname).join(', ')):'Well done! You found the culprit')+' at card '+best+'.</p>';
+  else h+='<p class="it" lang="it">Nessuno ha trovato il colpevole.</p><p class="en" lang="en">Nobody found the culprit.</p>';
+  h+='</div>';
+  for(p=0;p<d.n;p++){var gg=d.g[p],c=gg?castById(gg.sus):null;
+    rows+='<tr><td>'+esc(pname(p))+'</td><td>'+(c?esc(c.name.split(' ')[0]):'–')+'</td><td class="c">'+(gg?gg.card:'–')+'</td><td class="c">'+(gg?(gg.sus===META.culprit?'Sì':'No'):'–')+'</td></tr>';
+    if(d.expert&&gg&&gg.expl)rows+='<tr><td colspan="4"><small>'+esc(gg.expl)+'</small></td></tr>';}
+  h+='<div class="tw"><table class="tt"><thead><tr><th>Giocatore</th><th>Ipotesi</th><th>Carta</th><th>Giusto?</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var pz='';DECK.forEach(function(it,i){if(it.t==='puzzle')pz+='<li>Carta '+(i+1)+': <b>'+esc(it.ans[0])+'</b> '+(d.puz[i]?'(risolto)':'')+'</li>'});
+  if(pz)h+='<div class="card"><div class="card-h"><span class="tag">Enigmi</span></div><ul class="pl">'+pz+'</ul></div>';
+  h+='<button type="button" class="btn tape" data-act="dagain">Nuova partita<small>New game</small></button>';
+  return h;
+}
+function deckNav(){
+  var d=dk();
+  var T=[['carte','Carte','Cards'],['taccuino','Taccuino','Notebook'],d.fin?['risultati','Risultati','Results']:['ipotesi','Ipotesi','Guess']];
+  return '<nav class="nav" aria-label="Menu"><div class="nav-in" style="grid-template-columns:repeat(3,1fr)">'+T.map(function(t){return '<button type="button" class="tab" data-act="dtab" data-v="'+t[0]+'"'+(d.tab===t[0]?' aria-current="page"':'')+'>'+t[1]+'<small>'+t[2]+'</small></button>'}).join('')+'</div></nav>';
+}
+function renderDeck(){
+  var d=dk();
+  if(d.fin&&d.tab==='ipotesi')d.tab='risultati';
+  var f={carte:deckCarte,taccuino:viewNote,ipotesi:deckIpotesi,risultati:deckRisultati}[d.tab]||deckCarte;
+  $('#app').innerHTML=header()+'<main class="wrap main">'+f()+'</main>'+deckNav();
+}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-act]');
+  if(!b||b.tagName==='INPUT')return;
+  var a=b.getAttribute('data-act'),v=b.getAttribute('data-v'),d;
+  switch(a){
+   case 'mode':S.mode=v;if(v==='deck')dk();save();render();break;
+   case 'dn':d=dk();d.n=+v;save();render();break;
+   case 'dstart':d=dk();d.started=true;d.idx=0;d.turn=0;d.g={};d.fin=false;d.puz={};d.tab='carte';selDP=-1;selDS='';dEx='';dMsg=null;save();render();window.scrollTo(0,0);break;
+   case 'dtab':d=dk();d.tab=v;dMsg=null;save();render();window.scrollTo(0,0);break;
+   case 'ddraw':
+     d=dk();
+     if(DECK[d.idx]){
+       if(DECK[d.idx].t==='final'){for(var p=0;p<d.n;p++){if(!(d.g[p]&&d.g[p].att>0)){render();return}}}
+       d.idx++;d.turn=(d.turn+1)%d.n;
+       if(DECK[d.idx-1].t==='final'){d.fin=true;d.tab='risultati'}
+       save();render();window.scrollTo(0,0);
+     }
+     break;
+   case 'dsel':d=dk();selDP=+v;selDS='';dEx='';dMsg=null;render();break;
+   case 'dsave':
+     d=dk();
+     var ex=document.getElementById('dexpl');if(ex)dEx=ex.value;
+     var att=(d.g[selDP]&&d.g[selDP].att)||0;
+     if(selDP<0||att>=2){break}
+     if(!selDS){dMsg=['Scegli una persona.','Choose a person.'];render();break}
+     if(d.expert&&dEx.replace(/\s+/g,'').length<3){dMsg=['Scrivi una breve spiegazione.','Write a short explanation.'];render();break}
+     d.g[selDP]={att:att+1,sus:selDS,card:d.idx,expl:dEx};
+     dMsg=['Ipotesi salvata alla carta '+d.idx+'. Nessuno vede la risposta.','Guess saved at card '+d.idx+'. Nobody sees the answer.'];
+     selDS='';dEx='';if(d.n>1)selDP=-1;
+     save();render();window.scrollTo(0,0);
+     break;
+   case 'pz':
+     d=dk();
+     var inp=document.getElementById('pz'+v),it=DECK[+v],ok=false;
+     if(inp){var val=norm(inp.value);it.ans.forEach(function(x){if(norm(x)===val)ok=true})}
+     var out=document.getElementById('pzr'+v);
+     if(ok){d.puz[v]=true;save();if(out)out.innerHTML='<b>Esatto! / Correct!</b>'}
+     else if(out)out.textContent='Riprova / Try again';
+     break;
+   case 'dagain':S.deck=newDeck();selDP=-1;selDS='';dEx='';dMsg=null;save();render();window.scrollTo(0,0);break;
+   case 'dmenu':
+     if(pend==='dmenux'){d=dk();d.started=false;pend='';save();render();window.scrollTo(0,0)}
+     else{pend='dmenux';render()}
+     break;
+  }
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target;if(!t||!t.getAttribute)return;
+  var a=t.getAttribute('data-act');
+  if(a==='dsus')selDS=t.value;
+  if(a==='dexp'){dk().expert=t.checked;save()}
+});
+document.addEventListener('input',function(ev){
+  var t=ev.target;if(!t||!t.id)return;
+  if(t.id==='dexpl')dEx=t.value;
+  if(t.id.indexOf('dname')===0){dk().names[+t.id.slice(5)]=t.value;save()}
+});
+
+render();
+})();
+</script>
+</body></html>

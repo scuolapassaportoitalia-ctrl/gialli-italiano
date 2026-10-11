@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style><title>Delitto al Forno</title></head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Layout concept: a police case file on a phone. Sticky header with hazard tape, one column of evidence cards, fixed bottom tab bar. */
+:root{
+  --bg:#E6E9E7; --surface:#F7F8F6; --fg:#15202B; --muted:#4F5C67; --line:#C5CCC8;
+  --tape:#F2C300; --on-tape:#15202B; --stamp:#B3261E; --sea:#0A5A70; --yes:#1B6E45; --no:#B3261E;
+  --display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'Courier Prime','Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151A; --surface:#192027; --fg:#E8ECEA; --muted:#9BA8B2; --line:#2B353E;
+    --stamp:#FF7A6E; --sea:#6CC6DC; --yes:#5FD08F; --no:#FF7A6E; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10151A; --surface:#192027; --fg:#E8ECEA; --muted:#9BA8B2; --line:#2B353E;
+  --stamp:#FF7A6E; --sea:#6CC6DC; --yes:#5FD08F; --no:#FF7A6E; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3{font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0;line-height:1.1;text-wrap:balance}
+h2{font-size:26px}
+h3{font-size:19px;margin-bottom:6px}
+p{margin:0}
+small{font-size:13px;color:var(--muted)}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tape{height:10px;background:repeating-linear-gradient(-45deg,var(--tape) 0 14px,#15202B 14px 28px)}
+.top-row{display:flex;align-items:center;gap:10px;padding-block:8px}
+.brand{flex:1;min-width:0}
+.brand h1{font-size:28px;letter-spacing:.05em}
+.brand span{display:block;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pill{min-height:40px;min-width:44px;padding:0 12px;border:2px solid var(--fg);background:transparent;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:14px}
+.pill[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:var(--bg)}
+
+/* layout */
+.main{padding-block:18px 110px;display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:12px}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tag{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.08em;background:var(--tape);color:var(--on-tape);padding:2px 8px;border-radius:2px;text-transform:uppercase}
+.it{font-size:19px;line-height:1.55;overflow-wrap:anywhere}
+.en{color:var(--sea);font-size:16px;line-height:1.5;border-top:1px dashed var(--line);padding-top:8px;overflow-wrap:anywhere}
+.entog{align-self:flex-start;min-height:36px;padding:0 12px;border:1px solid var(--sea);color:var(--sea);background:transparent;border-radius:4px;font-size:14px;font-weight:700}
+.entog[aria-expanded="true"]{background:var(--sea);color:var(--bg)}
+.w{padding:0;border:0;border-bottom:2px dotted var(--sea);background:none;font:inherit;line-height:inherit;color:inherit;cursor:help}
+.gloss{background:var(--tape);color:var(--on-tape);font-weight:700;padding:6px 10px;border-radius:3px;font-size:16px;align-self:flex-start}
+.ico{width:44px;height:44px;border:1px solid var(--line);background:transparent;border-radius:50%;display:grid;place-items:center;flex:none}
+.ico[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:var(--bg)}
+.ico svg{width:22px;height:22px}
+
+/* buttons */
+.btn{min-height:50px;padding:0 20px;border:2px solid var(--fg);background:var(--fg);color:var(--bg);border-radius:4px;font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.btn.tape{background:var(--tape);color:var(--on-tape);border-color:var(--on-tape)}
+.btn.ghost{background:transparent;color:var(--fg)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn small{display:block;font-family:var(--body);font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:inherit;opacity:.85}
+.link{background:none;border:0;padding:8px 0;color:var(--muted);text-decoration:underline;font-size:15px;align-self:flex-start;min-height:44px}
+
+/* setup */
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chip{min-height:48px;border:2px solid var(--fg);background:transparent;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:18px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.chip[disabled]{opacity:.3;cursor:not-allowed}
+.q{font-weight:700;font-size:18px}
+.q small{display:block;font-weight:400}
+
+/* rounds */
+.rounds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rd{min-height:56px;border:2px solid var(--fg);background:transparent;border-radius:4px;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;padding:4px}
+.rd[aria-pressed="true"]{background:var(--tape);color:var(--on-tape);border-color:var(--on-tape)}
+.rd[aria-disabled="true"]{opacity:.45;border-style:dashed}
+.rd svg{width:16px;height:16px;flex:none}
+.task{border-left:6px solid var(--tape);padding-left:12px}
+.ask{background:transparent;border:2px dashed var(--muted)}
+
+/* cast */
+.av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:700;font-size:24px;flex:none}
+.who{display:flex;gap:12px;align-items:center}
+.who b{font-family:var(--display);font-size:22px;text-transform:uppercase;letter-spacing:.03em;display:block;line-height:1.1}
+.who span{font-size:15px;color:var(--muted)}
+
+/* notebook */
+.tw{overflow-x:auto}
+table.nb{border-collapse:collapse;width:100%;min-width:340px}
+.nb th,.nb td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.nb thead th{font-family:var(--mono);font-size:12px;text-transform:uppercase;vertical-align:bottom}
+.nb thead th small{display:block;text-transform:none;font-family:var(--body)}
+.nb tbody th{text-align:left;font-weight:700;font-size:16px;padding-right:8px}
+.nb tbody th small{display:block;font-weight:400}
+.cell{width:100%;min-width:52px;min-height:48px;border:2px solid var(--line);background:transparent;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:16px;color:var(--muted)}
+.cell.y{border-color:var(--yes);color:var(--yes);background:color-mix(in srgb,var(--yes) 14%,transparent)}
+.cell.n{border-color:var(--no);color:var(--no);background:color-mix(in srgb,var(--no) 14%,transparent)}
+
+/* accuse */
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:4px;background:var(--surface);min-height:56px}
+.opt input{width:24px;height:24px;margin:2px 0 0;accent-color:var(--sea);flex:none}
+.opt:has(input:checked){border-color:var(--fg)}
+.opt .e{display:block;color:var(--sea);font-size:15px}
+.msg{padding:12px 14px;border-radius:4px;background:var(--surface);border:2px solid var(--stamp)}
+.msg .e{display:block;color:var(--sea);font-size:15px}
+.stamp{display:inline-block;align-self:flex-start;border:4px solid var(--stamp);color:var(--stamp);font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:.08em;padding:2px 14px;transform:rotate(-5deg);text-transform:uppercase}
+@media (prefers-reduced-motion:no-preference){
+  .stamp{animation:st .35s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes st{from{transform:rotate(-14deg) scale(1.9);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+}
+ul.pl{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+ol.steps li span{display:block;color:var(--sea);font-size:15px}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:2px solid var(--fg);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{min-height:58px;border:0;background:none;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.05em;text-transform:uppercase;border-top:5px solid transparent;margin-top:-2px;padding:4px 2px}
+.tab small{display:block;font-family:var(--body);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0}
+.tab[aria-current="page"]{border-top-color:var(--tape);background:color-mix(in srgb,var(--tape) 16%,transparent)}
+
+/* overlay */
+.ov{position:fixed;inset:0;z-index:20;background:var(--bg);overflow:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.ov .wrap{padding-block:16px 40px;display:flex;flex-direction:column;gap:12px}
+.ov input[type=search]{min-height:48px;padding:0 12px;border:2px solid var(--fg);border-radius:4px;background:var(--surface);color:var(--fg);font:inherit;width:100%}
+.gl-item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.gl-item b{overflow-wrap:anywhere}
+.gl-item span{color:var(--sea);text-align:right;overflow-wrap:anywhere}
+table.tt{border-collapse:collapse;width:100%;font-size:15px}
+.tt th,.tt td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}
+.tt td.c{font-family:var(--mono);text-align:center}
+
+.prog{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:6px}
+.prog i{display:block;height:100%;background:var(--tape)}
+.turn{background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:4px;display:flex;flex-direction:column}
+.turn small{color:inherit;opacity:.85}
+.txt{min-height:48px;padding:0 12px;border:2px solid var(--fg);border-radius:4px;background:var(--surface);color:var(--fg);font:inherit;width:100%;min-width:0}
+textarea.txt{min-height:96px;padding:10px 12px;resize:vertical}
+details.old{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+details.old summary{min-height:48px;display:flex;align-items:center;padding:0 14px;font-weight:700;cursor:pointer}
+details.old .card{border:0;border-top:1px solid var(--line);border-radius:0}
+</style>
+
+<div id="app"></div>
+<div id="gl" class="ov" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var TTS=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
+var SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+var LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+/* ---------- content ---------- */
+var CAST=[
+ {id:'nicola',name:'Nicola Lorusso',age:41,role:'figlio di Rosa',roleEn:"Rosa's son",desc:'Ha un [ristorante|restaurant].',descEn:'He has a restaurant.',color:'#2F6F8F'},
+ {id:'marta',name:'Marta Lorusso',age:36,role:'figlia di Rosa',roleEn:"Rosa's daughter",desc:'Lavora nel forno con la mamma.',descEn:'She works in the bakery with her mother.',color:'#8A4F7D'},
+ {id:'franco',name:'Franco Mele',age:63,role:'panettiere',roleEn:'baker',desc:'Lavora nel forno da 35 anni.',descEn:'He has worked in the bakery for 35 years.',color:'#9A6B2F'},
+ {id:'elena',name:'Elena Greco',age:50,role:'fioraia',roleEn:'florist',desc:'Ha un negozio di fiori vicino al forno.',descEn:'She has a flower shop next to the bakery.',color:'#3F7D4F'},
+ {id:'dario',name:'Dario Fanelli',age:24,role:'fattorino',roleEn:'delivery man',desc:'Trova il corpo di Rosa.',descEn:"He finds Rosa's body.",color:'#3D5BA8'},
+ {id:'giulia',name:'Giulia Marino',age:44,role:'compratrice di SuperPuglia',roleEn:'buyer for SuperPuglia',desc:'Lavora per un grande supermercato.',descEn:'She works for a big supermarket.',color:'#A84B4B'}
+];
+
+var STORY={
+ it:[
+  'Domenica mattina, a [Bari Vecchia|the old town of Bari]. Il [forno|bakery] Lorusso è famoso per le [focacce|focaccia, flat bread] e le [orecchiette|ear-shaped pasta].',
+  'Alle 6:30 il [fattorino|delivery man] Dario entra nel forno. Trova la signora Rosa Lorusso a [terra|on the floor], nel [magazzino|storeroom]. Rosa è [morta|dead].',
+  "L'[ispettrice|(female) inspector] Bruno arriva subito. Dice: «Nessuno esce dal quartiere. Cerchiamo l'[assassino|killer]!»",
+  'Voi siete [investigatori|detectives]. Ogni persona ha [indizi|clues] diversi sul telefono. Leggete a voce alta e parlate insieme.'
+ ],
+ en:[
+  'Sunday morning, in the old town of Bari. The Lorusso bakery is famous for its focaccia and orecchiette.',
+  'At 6:30 the delivery man Dario enters the bakery. He finds Mrs Rosa Lorusso on the floor in the storeroom. Rosa is dead.',
+  "Inspector Bruno arrives at once. She says: \"Nobody leaves the neighbourhood. Let's find the killer!\"",
+  'You are detectives. Each person has different clues on their phone. Read aloud and talk together.'
+ ]
+};
+var RULES=[
+ ['Leggi il tuo indizio a [voce alta|out loud].','Read your clue out loud.'],
+ ['Ascolta gli altri giocatori.','Listen to the other players.'],
+ ['Scrivi nel taccuino.','Write in the notebook.'],
+ ['Alla fine, [accusa|accuse] il colpevole.','At the end, accuse the culprit.']
+];
+
+var ROUNDS={
+ 2:{t:'Perché?',te:'Why? (motives)',task:'Leggete gli indizi a voce alta. Chi ha un [motivo|reason] per [uccidere|to kill] Rosa?',taskEn:'Read the clues out loud. Who has a reason to kill Rosa?'},
+ 3:{t:'I fatti',te:'The facts',task:'Leggete gli indizi. Quando e come muore Rosa? Chi può entrare nel forno?',taskEn:'Read the clues. When and how does Rosa die? Who can get into the bakery?'},
+ 4:{t:'Alibi',te:'Alibis',task:'Leggete gli indizi. Chi ha un [alibi|proof you were somewhere else] e chi no?',taskEn:'Read the clues. Who has an alibi and who does not?'}
+};
+
+var CLUES=[
+ {id:'2.1',r:2,t:'Sabato sera',it:'Sabato sera Rosa parla con la famiglia. Dice: «Non [vendo|I sell] il forno. Lo lascio a Marta.»',en:"On Saturday evening Rosa talks to the family. She says: \"I'm not selling the bakery. I'm leaving it to Marta.\""},
+ {id:'2.2',r:2,t:'Nicola',it:'Nicola è il figlio di Rosa. Ha un ristorante e molti [debiti|debts]. Vuole i soldi della [vendita|sale]. Sabato è molto [arrabbiato|angry].',en:"Nicola is Rosa's son. He has a restaurant and a lot of debt. He wants the money from the sale. On Saturday he is very angry."},
+ {id:'2.3',r:2,t:'Giulia',it:'Giulia Marino lavora per SuperPuglia, un grande supermercato. Vuole comprare il forno e la [ricetta|recipe] della focaccia. Rosa dice di no.',en:'Giulia Marino works for SuperPuglia, a big supermarket. She wants to buy the bakery and the focaccia recipe. Rosa says no.'},
+ {id:'2.4',r:2,t:'Elena',it:'Elena Greco ha un negozio di fiori vicino al forno. Il [fumo|smoke] del forno rovina i suoi fiori. Elena e Rosa [litigano|argue] spesso.',en:"Elena Greco has a flower shop next to the bakery. The smoke from the oven ruins her flowers. Elena and Rosa often argue."},
+ {id:'2.5',r:2,t:'Dario',it:'Dario rompe il frigorifero del forno. Costa 500 euro. Rosa vuole i soldi. Dario non ha soldi.',en:"Dario breaks the bakery's fridge. It costs 500 euros. Rosa wants the money. Dario has no money."},
+ {id:'2.6',r:2,t:'Franco',it:'Franco lavora nel forno da 35 anni. Sabato Rosa dice: «Da lunedì non lavori più qui.» Franco esce dal forno in [silenzio|silence].',en:"Franco has worked in the bakery for 35 years. On Saturday Rosa says: \"From Monday you don't work here any more.\" Franco leaves the bakery in silence."},
+ {id:'2.7',r:2,t:'Marta',it:'Marta lavora con la mamma. Ama il forno. Sabato è contenta, ma Rosa e Marta litigano spesso per le nuove ricette.',en:'Marta works with her mother. She loves the bakery. On Saturday she is happy, but Rosa and Marta often argue about new recipes.'},
+
+ {id:'3.1',r:3,t:'Il ritrovamento',it:'Dario trova Rosa alle 6:30. Chiama la polizia alle 6:32. L\'ispettrice arriva alle 6:40.',en:'Dario finds Rosa at 6:30. He calls the police at 6:32. The inspector arrives at 6:40.'},
+ {id:'3.2',r:3,t:'Il timer',it:'Il [timer|timer] del forno suona alle 5:40. Le focacce sono nere. Rosa non lascia mai le focacce nel forno dopo il timer.',en:'The oven timer rings at 5:40. The focaccias are black. Rosa never leaves the focaccias in the oven after the timer.'},
+ {id:'3.3',r:3,t:'Alle 5:00',it:'Rosa mette le focacce nel forno alle 5:00. Il forno [cuoce|cooks] le focacce per 40 minuti. Alle 5:00 Rosa è [viva|alive].',en:'Rosa puts the focaccias in the oven at 5:00. The oven cooks them for 40 minutes. At 5:00 Rosa is alive.'},
+ {id:'3.4',r:3,t:'Le porte',it:'La porta davanti è chiusa. La porta dietro è aperta, ma non è rotta. Si apre solo con la [chiave|key].',en:'The front door is closed. The back door is open, but it is not broken. It opens only with a key.'},
+ {id:'3.5',r:3,t:'Le chiavi',it:'Ci sono quattro chiavi della porta dietro. Hanno una chiave: Rosa, Nicola, Marta e Franco.',en:'There are four keys to the back door. These people have a key: Rosa, Nicola, Marta and Franco.'},
+ {id:'3.6',r:3,t:"L'arma",it:"L'ispettrice trova l'[arma|weapon]: un [mattarello|rolling pin] di legno. È [nascosto|hidden] nel sacco della [farina|flour]. La polizia non dice a nessuno come è morta Rosa.",en:'The inspector finds the weapon: a wooden rolling pin. It is hidden in the flour bag. The police tell nobody how Rosa died.'},
+ {id:'3.7',r:3,t:'Un bottone',it:'Sul pavimento c\'è un [bottone|button] blu. Alla giacca blu di Dario [manca|is missing] un bottone. Dario dice: «Perdo il bottone alle 6:30, quando trovo Rosa.»',en:"There is a blue button on the floor. Dario's blue jacket is missing a button. Dario says: \"I lose the button at 6:30, when I find Rosa.\""},
+
+ {id:'4.1',r:4,t:'Nicola',it:'Nicola ha una [ricevuta|receipt] del mercato del pesce di Molfetta: ore 5:30. Molfetta è a 40 minuti da Bari.',en:'Nicola has a receipt from the fish market in Molfetta: 5:30. Molfetta is 40 minutes from Bari.'},
+ {id:'4.2',r:4,t:'Marta',it:'Marta corre sul [Lungomare|seafront] con un amico, Luca. Fanno due foto: una alle 5:15 e una alle 5:45. Il Lungomare è a 20 minuti dal forno.',en:'Marta runs on the seafront with a friend, Luca. They take two photos: one at 5:15 and one at 5:45. The seafront is 20 minutes from the bakery.'},
+ {id:'4.3',r:4,t:'Elena',it:'Dalle 5:00 alle 5:45 Elena è nel suo negozio con Gianni, il [fornitore|supplier] di fiori. Gianni firma un documento alle 5:45.',en:'From 5:00 to 5:45 Elena is in her shop with Gianni, the flower supplier. Gianni signs a document at 5:45.'},
+ {id:'4.4',r:4,t:'Giulia',it:'Giulia è in albergo. Dalle 5:00 alle 6:00 ha una [videochiamata|video call] di lavoro con New York. C\'è la registrazione.',en:'Giulia is in a hotel. From 5:00 to 6:00 she has a work video call with New York. There is a recording.'},
+ {id:'4.5',r:4,t:'Dario',it:'Il furgone di Dario è al [deposito|depot] fino alle 5:55. Il GPS lo conferma. Il deposito è a 20 minuti dal forno.',en:"Dario's van is at the depot until 5:55. The GPS confirms it. The depot is 20 minutes from the bakery."},
+ {id:'4.6',r:4,t:'Franco',it:'Franco dice: «Alle 5:00 dormo a casa. Mia moglie è a Lecce da sua sorella.» Nessuno conferma.',en:"Franco says: \"At 5:00 I'm sleeping at home. My wife is in Lecce at her sister's.\" Nobody confirms it."},
+ {id:'4.7',r:4,t:'Alle 6:45',it:'Franco arriva al forno alle 6:45. Un agente dice solo: «Rosa è morta.» Franco grida: «Poverina! [Colpita|Hit] con il mattarello!»',en:"Franco arrives at the bakery at 6:45. An officer says only: \"Rosa is dead.\" Franco shouts: \"Poor woman! Hit with the rolling pin!\""}
+];
+
+var QUESTIONS={
+ 2:[['Chi ha un motivo?','Who has a reason?'],['Chi è arrabbiato?','Who is angry?'],['Chi vuole i soldi?','Who wants money?'],['Chi litiga con Rosa?','Who argues with Rosa?'],['Chi perde il lavoro?','Who loses their job?']],
+ 3:[['Quando muore Rosa?','When does Rosa die?'],['Chi ha una chiave?','Who has a key?'],["Dov'è l'arma?",'Where is the weapon?'],['Chi sa come muore Rosa?','Who knows how Rosa dies?'],['La porta è rotta?','Is the door broken?']],
+ 4:[['Chi ha un alibi?','Who has an alibi?'],["Dov'è Nicola alle 5:30?",'Where is Nicola at 5:30?'],['Chi non ha un alibi?','Who has no alibi?'],['Chi sa dell\'arma?','Who knows about the weapon?'],['Chi è il colpevole? Perché?','Who is the culprit? Why?']]
+};
+
+var COLS=[{k:'motive',it:'Motivo',en:'Motive'},{k:'key',it:'Chiave',en:'Key'},{k:'alibi',it:'Alibi',en:'Alibi'},{k:'weapon',it:"Sa l'arma",en:'Knows weapon'}];
+
+var PROOFS=[
+ {k:'key',it:'Ha la chiave della porta dietro.',en:'Has the key to the back door.',ok:true},
+ {k:'alibi',it:'Non ha un alibi.',en:'Has no alibi.',ok:true},
+ {k:'weapon',it:'Sa come è morta Rosa, ma nessuno lo dice.',en:'Knows how Rosa died, but nobody told them.',ok:true},
+ {k:'button',it:'Ha un bottone blu.',en:'Has a blue button.',ok:false},
+ {k:'debts',it:'Ha un ristorante e molti debiti.',en:'Has a restaurant and a lot of debt.',ok:false},
+ {k:'argue',it:'Litiga spesso con Rosa.',en:'Often argues with Rosa.',ok:false}
+];
+
+var SOL={
+ it:[
+  'Il colpevole è [Franco Mele|Franco Mele], il panettiere.',
+  'Sabato Rosa dice a Franco: «Da lunedì non lavori più qui.» Franco è molto arrabbiato.',
+  'Domenica, alle 5:10, Franco apre la porta dietro con la sua chiave. Parla con Rosa nel magazzino e la [colpisce|hits] con il mattarello. Poi [nasconde|hides] il mattarello nel sacco della farina.',
+  'Nicola, Marta, Elena, Dario e Giulia hanno un alibi. Solo Franco non ha un alibi.',
+  "Alle 6:45 Franco dice: «Colpita con il mattarello!» Ma nessuno parla del mattarello. Solo l'assassino lo sa!"
+ ],
+ en:[
+  'The culprit is Franco Mele, the baker.',
+  'On Saturday Rosa tells Franco: "From Monday you don\'t work here any more." Franco is very angry.',
+  'On Sunday, at 5:10, Franco opens the back door with his key. He talks to Rosa in the storeroom and hits her with the rolling pin. Then he hides the rolling pin in the flour bag.',
+  'Nicola, Marta, Elena, Dario and Giulia all have an alibi. Only Franco has no alibi.',
+  'At 6:45 Franco says: "Hit with the rolling pin!" But nobody has mentioned the rolling pin. Only the killer knows it!'
+ ]
+};
+
+
+var META={
+ key:'delitto-al-forno-v1',
+ title:'Delitto al Forno',
+ setupH:'Chi ha ucciso Rosa?',
+ culprit:'franco',
+ victim:{init:'R',name:'Rosa Lorusso',it:'68 anni · proprietaria del forno',en:'68 · owner of the bakery',color:'#55616B'},
+ inspector:{init:'B',name:'Ispettrice Bruno',it:'Polizia di Bari',en:'Bari police · she leads the investigation'},
+ suspectsLine:'Ora guardate i [sospetti|suspects]: sono sei.',
+ suspectsSub:'Sei persone. Chi è il colpevole? / Six people. Who is the culprit?',
+ noteExIt:'Esempio: Nicola ha una chiave? Se sì, tocca Sì nella colonna Chiave.',
+ noteExEn:'Example: does Nicola have a key? If yes, tap Yes in the Key column.',
+ solProofs:[['Franco ha la chiave.','Franco has a key.'],['Franco non ha un alibi.','Franco has no alibi.'],['Franco sa del mattarello.','Franco knows about the rolling pin.']],
+ teacher:"Franco Mele. Chiave + nessun alibi + conosce l'arma (mattarello) prima della polizia. Orario del delitto: 5:00–5:40.",
+ caso:''
+};
+
+var DECK=[{t:'story'},{t:'cast',ids:['nicola','marta']},{t:'cast',ids:['franco','elena']},{t:'cast',ids:['dario','giulia']},
+{t:'clue',id:'3.1'},{t:'clue',id:'2.1'},{t:'clue',id:'2.2'},{t:'clue',id:'2.3'},{t:'clue',id:'2.4'},{t:'clue',id:'2.5'},{t:'clue',id:'2.6'},{t:'clue',id:'2.7'},
+{t:'clue',id:'3.3'},{t:'clue',id:'3.2'},
+{t:'puzzle',it:'Enigma: Rosa mette le focacce nel forno alle 5:00. Le focacce cuociono per 40 minuti. A che ora suona il timer?',en:'Puzzle: Rosa puts the focaccias in the oven at 5:00. They bake for 40 minutes. At what time does the timer ring?',ans:['5:40']},
+{t:'clue',id:'3.4'},{t:'clue',id:'3.5'},{t:'clue',id:'3.7'},
+{t:'clue',id:'4.1'},{t:'clue',id:'4.2'},{t:'clue',id:'4.3'},{t:'clue',id:'4.4'},{t:'clue',id:'4.5'},
+{t:'puzzle',it:'Enigma: Molfetta è a 40 minuti da Bari. Nicola è a Molfetta alle 5:30. A che ora lascia Bari al più tardi?',en:'Puzzle: Molfetta is 40 minutes from Bari. Nicola is in Molfetta at 5:30. What time does he leave Bari at the latest?',ans:['4:50']},
+{t:'clue',id:'4.6'},{t:'clue',id:'3.6'},{t:'clue',id:'4.7'},
+{t:'final',it:"L'ispettrice Bruno ha tutti gli elementi per [accusare|accuse] il colpevole, anche grazie alle vostre idee. Ora leggete la soluzione.",en:'Inspector Bruno has everything she needs to accuse the culprit, also thanks to your ideas. Now read the solution.'}];
+
+/* ---------- state ---------- */
+var KEY=META.key;
+var S={mode:'split',deck:null,n:1,me:1,started:false,unlocked:1,en:false,marks:{},attempts:0,solved:false,revealed:false};
+try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);for(var k in o){S[k]=o[k]}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+var tab='caso',round=2,pend='',openEn={},selSus='',selProofs={},hintShown=false,teacherOpen=false,resHtml='';
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function mk(s){return esc(s).replace(/\[([^|\]]+)\|([^\]]+)\]/g,function(m,a,b){return '<button type="button" class="w" data-act="w" data-t="'+b+'">'+a+'</button>'})}
+function plain(s){return s.replace(/\[([^|\]]+)\|([^\]]+)\]/g,'$1')}
+function owner(i){return (i%S.n)+1}
+function myClues(r){var out=[];CLUES.forEach(function(c,i){if(c.r===r&&owner(i)===S.me)out.push(c)});return out}
+function cardHtml(id,tag,title,it,en){
+  var open=S.en||openEn[id];
+  var its=(Array.isArray(it)?it:[it]).map(function(p){return '<p class="it" lang="it">'+mk(p)+'</p>'}).join('');
+  var ens=(Array.isArray(en)?en:[en]).map(function(p){return '<p lang="en">'+esc(p)+'</p>'}).join('');
+  return '<article class="card" data-id="'+id+'"><div class="card-h"><span class="tag">'+tag+'</span>'+
+    (TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'')+'</div>'+
+    (title?'<h3>'+esc(title)+'</h3>':'')+its+'<div class="gloss" hidden aria-live="polite"></div>'+
+    '<button type="button" class="entog" data-act="ent" aria-expanded="'+(open?'true':'false')+'">English</button>'+
+    '<div class="en" '+(open?'':'hidden')+'>'+ens+'</div></article>';
+}
+function bi(it,en){return '<span lang="it">'+esc(it)+'</span><small lang="en">'+esc(en)+'</small>'}
+
+/* ---------- views ---------- */
+function header(){
+  return '<header class="top"><div class="tape"></div><div class="wrap top-row"><div class="brand"><h1>'+esc(META.title)+'</h1><span>Giallo in italiano · A1–A2</span></div>'+
+   '<button type="button" class="pill" data-act="en" aria-pressed="'+(S.en?'true':'false')+'" aria-label="Mostra sempre inglese / Always show English">EN</button>'+
+   '<button type="button" class="pill" data-act="glos" aria-label="Parole / Glossary">Aa</button></div></header>';
+}
+function nav(){
+  var T=[['caso','Caso','Case'],['indizi','Indizi','Clues'],['sospetti','Sospetti','Suspects'],['taccuino','Taccuino','Notebook'],['accusa','Accusa','Accuse']];
+  return '<nav class="nav" aria-label="Menu"><div class="nav-in">'+T.map(function(t){
+    return '<button type="button" class="tab" data-act="tab" data-v="'+t[0]+'"'+(tab===t[0]?' aria-current="page"':'')+'>'+t[1]+'<small>'+t[2]+'</small></button>'}).join('')+'</div></nav>';
+}
+function viewSetup(){
+  if(S.mode==='deck')return deckSetup();
+  var chips='';for(var i=1;i<=10;i++)chips+='<button type="button" class="chip" data-act="n" data-v="'+i+'" aria-pressed="'+(S.n===i)+'">'+i+'</button>';
+  var me='';for(var j=1;j<=10;j++)me+='<button type="button" class="chip" data-act="me" data-v="'+j+'" aria-pressed="'+(S.me===j)+'"'+(j>S.n?' disabled':'')+'>'+j+'</button>';
+  return '<div class="stack"><h2>'+esc(META.setupH)+'</h2>'+
+   '<p class="it" lang="it">Un giallo da risolvere insieme. Ogni giocatore apre questo link sul suo telefono.</p>'+
+   '<p class="en" lang="en">A mystery to solve together. Each player opens this link on their own phone.</p></div>'+
+   modeChooser()+'<section class="stack"><div class="q" lang="it">Quanti giocatori siete?<small lang="en">How many players are you? (1–10)</small></div><div class="chips">'+chips+'</div></section>'+
+   '<section class="stack"><div class="q" lang="it">Il tuo numero<small lang="en">Your number. Each person chooses a different number.</small></div><div class="chips">'+me+'</div></section>'+
+   '<button type="button" class="btn tape" data-act="start">Inizia<small>Start</small></button>'+
+   '<button type="button" class="link" data-act="teacher">Per l\'insegnante / For the teacher</button>'+
+   (teacherOpen?teacherHtml():'');
+}
+function teacherHtml(){
+  var rows=CLUES.map(function(c,i){return '<tr><td class="c">'+c.id+'</td><td>'+esc(c.t)+'</td><td class="c">'+owner(i)+'</td></tr>'}).join('');
+  return '<div class="card"><h3>Distribuzione indizi / Clue distribution</h3><small>Con '+S.n+' giocatori / With '+S.n+' players</small>'+
+   '<div class="tw"><table class="tt"><thead><tr><th>#</th><th>Indizio</th><th>Giocatore</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+   '<h3>Soluzione / Solution</h3><p>'+esc(META.teacher)+'</p>'+
+   '<small>Consiglio: 5 minuti per Round. Ogni studente legge ad alta voce, poi tutti riassumono in una frase. / Tip: 5 minutes per round. Each student reads aloud, then everyone summarises in one sentence.</small></div>';
+}
+function viewCaso(){
+  var h='<h2>Il caso</h2>'+cardHtml('story','Round 1 · La storia','',STORY.it,STORY.en);
+  h+='<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+RULES.map(function(r){return '<li>'+mk(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>';
+  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who"><div class="av" style="background:'+META.victim.color+'" aria-hidden="true">'+META.victim.init+'</div><div><b>'+esc(META.victim.name)+'</b><span lang="it">'+esc(META.victim.it)+'</span><small lang="en" style="display:block">'+esc(META.victim.en)+'</small></div></div></div>';
+  h+=META.caso||'';
+  h+='<p lang="it">'+mk(META.suspectsLine)+'</p>';
+  if(S.unlocked<2){h+=confirmBtn('unlock','2','Siamo pronti: Round 2','We are ready: Round 2')}
+  else h+='<button type="button" class="btn tape" data-act="tab" data-v="indizi">Vai agli indizi<small>Go to the clues</small></button>';
+  h+='<button type="button" class="link" data-act="restart">Cambia giocatore / Change player</button>';
+  return h;
+}
+function confirmBtn(act,v,it,en){
+  var on=pend===act+v;
+  return '<button type="button" class="btn tape" data-act="'+act+'" data-v="'+v+'">'+(on?'Tocca ancora per confermare':esc(it))+'<small>'+(on?'Tap again to confirm':esc(en))+'</small></button>';
+}
+function viewIndizi(){
+  var rd='';[2,3,4].forEach(function(r){
+    var lock=r>S.unlocked;
+    rd+='<button type="button" class="rd" data-act="round" data-v="'+r+'" aria-pressed="'+(round===r)+'" aria-disabled="'+lock+'">'+(lock?LOCK:'')+'<span>'+r+' · '+ROUNDS[r].t+'</span></button>';
+  });
+  var R=ROUNDS[round];
+  var mine=myClues(round);
+  var h='<h2>Round '+round+'</h2><small>Giocatore '+S.me+' di '+S.n+' · Player '+S.me+' of '+S.n+'</small><div class="rounds">'+rd+'</div>';
+  if(round>S.unlocked){return h+'<p lang="it">Questo round è [bloccato|locked]. Tornate al Round '+S.unlocked+'.</p>'}
+  h+='<div class="task"><p class="it" lang="it">'+mk(R.task)+'</p><p class="en" lang="en" style="border:0;padding-top:4px">'+esc(R.taskEn)+'</p></div>';
+  if(mine.length){
+    h+='<h3 lang="it" style="margin-top:4px">I tuoi indizi ('+mine.length+')</h3>';
+    mine.forEach(function(c){h+=cardHtml(c.id,'Indizio '+c.id,c.t,c.it,c.en)});
+  }else{
+    h+='<div class="card"><p class="it" lang="it">Nessun indizio per te in questo round. Ascolta gli altri e fai domande.</p><p class="en" lang="en">No clue for you in this round. Listen to the others and ask questions.</p></div>';
+  }
+  var q=QUESTIONS[round][(S.me-1)%QUESTIONS[round].length];
+  h+='<div class="card ask"><div class="card-h"><span class="tag">La tua domanda</span></div><p class="it" lang="it">Chiedi al gruppo: <b>'+esc(q[0])+'</b></p><p class="en" lang="en" style="border:0;padding:0">Ask the group: '+esc(q[1])+'</p></div>';
+  if(round<4){
+    if(S.unlocked>round)h+='<button type="button" class="btn tape" data-act="round" data-v="'+(round+1)+'">Round '+(round+1)+'<small>Next round</small></button>';
+    else h+=confirmBtn('unlock',String(round+1),'Siamo pronti: Round '+(round+1),'We are ready: Round '+(round+1));
+  }else{
+    h+='<button type="button" class="btn tape" data-act="tab" data-v="accusa">Pronti ad accusare<small>Ready to accuse</small></button>';
+  }
+  return h;
+}
+function viewSospetti(){
+  var h='<h2>I sospetti</h2><small>'+esc(META.suspectsSub)+'</small>';
+  h+='<div class="card"><div class="who"><div class="av" style="background:#34495E" aria-hidden="true">'+META.inspector.init+'</div><div><b>'+esc(META.inspector.name)+'</b><span lang="it">'+esc(META.inspector.it.split(' · ')[1]||'')+'</span><small lang="en" style="display:block">'+esc(META.inspector.en)+'</small></div></div></div>';
+  CAST.forEach(function(c){
+    h+='<article class="card" data-id="s-'+c.id+'"><div class="who"><div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div><div><b>'+c.name+'</b><span lang="it">'+c.age+' anni · '+c.role+'</span><small lang="en" style="display:block">'+c.age+' · '+esc(c.roleEn)+'</small></div></div>'+
+     '<p class="it" lang="it">'+mk(c.desc)+'</p><div class="gloss" hidden></div><p class="en" lang="en" '+(S.en?'':'hidden')+'>'+esc(c.descEn)+'</p></article>';
+  });
+  return h;
+}
+function viewNote(){
+  var h='<h2>Il taccuino</h2><p lang="it">Tocca una casella: <b>?</b> → <b>Sì</b> → <b>No</b>.</p><small lang="en">Tap a box: ? (not sure) → Yes → No.</small>';
+  h+='<div class="tw"><table class="nb"><thead><tr><th scope="col">'+bi('Sospetto','Suspect')+'</th>'+COLS.map(function(c){return '<th scope="col">'+bi(c.it,c.en)+'</th>'}).join('')+'</tr></thead><tbody>';
+  CAST.forEach(function(c){
+    h+='<tr><th scope="row">'+esc(c.name.split(' ')[0])+'<small>'+esc(c.roleEn)+'</small></th>';
+    COLS.forEach(function(col){
+      var v=(S.marks[c.id]&&S.marks[c.id][col.k])||'';
+      h+='<td><button type="button" class="cell '+v+'" data-act="mark" data-s="'+c.id+'" data-k="'+col.k+'" aria-label="'+esc(c.name+', '+col.it)+': '+(v==='y'?'Sì':v==='n'?'No':'?')+'">'+(v==='y'?'Sì':v==='n'?'No':'?')+'</button></td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="card"><p class="it" lang="it">'+esc(META.noteExIt)+'</p><p class="en" lang="en">'+esc(META.noteExEn)+'</p></div>';
+  h+=confirmBtnGhost('resetnb','x','Cancella il taccuino','Clear the notebook');
+  return h;
+}
+function confirmBtnGhost(act,v,it,en){
+  var on=pend===act+v;
+  return '<button type="button" class="btn ghost" data-act="'+act+'" data-v="'+v+'">'+(on?'Tocca ancora':esc(it))+'<small>'+(on?'Tap again':esc(en))+'</small></button>';
+}
+function viewAccusa(){
+  if(S.solved||S.revealed)return viewSol();
+  var h='<h2>Accusa</h2><p class="it" lang="it">Chi è il colpevole? Scegliete insieme una persona e tre prove.</p><p class="en" lang="en">Who is the culprit? Choose one person and three proofs together.</p>';
+  h+='<fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="q" lang="it" style="padding:0 0 8px">1. Il colpevole<small lang="en">The culprit</small></legend>';
+  CAST.forEach(function(c){h+='<label class="opt"><input type="radio" name="sus" data-act="pick" value="'+c.id+'"'+(selSus===c.id?' checked':'')+'><span><b>'+c.name+'</b><span class="e">'+esc(c.roleEn)+'</span></span></label>'});
+  h+='</fieldset><fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="q" lang="it" style="padding:0 0 8px">2. Tre prove<small lang="en">Three proofs</small></legend>';
+  PROOFS.forEach(function(p){h+='<label class="opt"><input type="checkbox" data-act="proof" value="'+p.k+'"'+(selProofs[p.k]?' checked':'')+'><span lang="it">'+esc(p.it)+'<span class="e" lang="en">'+esc(p.en)+'</span></span></label>'});
+  h+='</fieldset><div id="res" aria-live="polite">'+resHtml+'</div>';
+  h+='<button type="button" class="btn tape" data-act="accuse">Accuso!<small>I accuse!</small></button>';
+  if(S.attempts>=2&&!hintShown)h+='<button type="button" class="btn ghost" data-act="hint">Un aiuto<small>A hint</small></button>';
+  if(hintShown)h+='<div class="card"><p class="it" lang="it">Aiuto: Chi ha una chiave? Chi non ha un alibi? Chi sa come muore Rosa?</p><p class="en" lang="en">Hint: Who has a key? Who has no alibi? Who knows how Rosa dies?</p></div>';
+  if(S.attempts>=3)h+=confirmBtnGhost('reveal','x','Mostra la soluzione','Show the solution');
+  return h;
+}
+function viewSol(){
+  var h='<span class="stamp">Caso chiuso</span><h2>La soluzione</h2>'+cardHtml('sol','Soluzione','',SOL.it,SOL.en);
+  h+='<div class="card"><div class="card-h"><span class="tag">Le prove</span></div><ol class="steps">'+META.solProofs.map(function(p){return '<li>'+esc(p[0])+'<span lang="en">'+esc(p[1])+'</span></li>'}).join('')+'</ol></div>';
+  h+='<button type="button" class="btn tape" data-act="again">Gioca ancora<small>Play again</small></button>';
+  return h;
+}
+function glossaryData(){
+  var map={};var texts=[].concat(STORY.it,SOL.it);
+  RULES.forEach(function(r){texts.push(r[0])});
+  CLUES.forEach(function(c){texts.push(c.it)});
+  Object.keys(ROUNDS).forEach(function(k){texts.push(ROUNDS[k].task)});
+  CAST.forEach(function(c){texts.push(c.desc)});
+  texts.push(META.suspectsLine);
+  texts.forEach(function(t){var re=/\[([^|\]]+)\|([^\]]+)\]/g,m;while((m=re.exec(t))){var k=m[1].toLowerCase();if(!map[k])map[k]=[m[1],m[2]]}});
+  return Object.keys(map).sort(function(a,b){return a.localeCompare(b,'it')}).map(function(k){return map[k]});
+}
+var GL=null;
+function openGlossary(){
+  if(!GL)GL=glossaryData();
+  var el=$('#gl');
+  el.innerHTML='<div class="wrap"><div class="row" style="justify-content:space-between;align-items:center"><h2>Parole</h2><button type="button" class="pill" data-act="closeglos">Chiudi</button></div><small>Glossario italiano → inglese / Italian → English glossary</small><input type="search" id="gs" placeholder="Cerca / Search" aria-label="Cerca / Search"><div id="gl-list">'+glList('')+'</div></div>';
+  el.hidden=false;
+  document.body.style.overflow='hidden';
+}
+function glList(q){
+  q=q.toLowerCase();
+  var items=GL.filter(function(p){return !q||p[0].toLowerCase().indexOf(q)>-1||p[1].toLowerCase().indexOf(q)>-1});
+  if(!items.length)return '<p>Nessun risultato / No results</p>';
+  return items.map(function(p){return '<div class="gl-item"><b lang="it">'+esc(p[0])+'</b><span lang="en">'+esc(p[1])+'</span></div>'}).join('');
+}
+
+function render(){
+  if(S.mode==='deck'){
+    if(S.deck&&S.deck.started){renderDeck();return}
+    $('#app').innerHTML=header()+'<main class="wrap main">'+viewSetup()+'</main>';return;
+  }
+  var body;
+  if(!S.started)body=viewSetup();
+  else body=({caso:viewCaso,indizi:viewIndizi,sospetti:viewSospetti,taccuino:viewNote,accusa:viewAccusa})[tab]();
+  $('#app').innerHTML=header()+'<main class="wrap main">'+body+'</main>'+(S.started?nav():'');
+}
+function go(t){tab=t;pend='';render();window.scrollTo(0,0)}
+
+/* ---------- speech ---------- */
+function speak(card,btn){
+  if(!TTS)return;
+  try{
+    var ss=window.speechSynthesis;
+    if(btn.getAttribute('aria-pressed')==='true'){ss.cancel();btn.setAttribute('aria-pressed','false');return}
+    ss.cancel();
+    $$('.ico[aria-pressed="true"]').forEach(function(b){b.setAttribute('aria-pressed','false')});
+    var txt=$$('.it',card).map(function(n){return n.textContent}).join(' ');
+    var u=new SpeechSynthesisUtterance(txt);u.lang='it-IT';u.rate=0.85;
+    var v=ss.getVoices().filter(function(x){return /^it/i.test(x.lang)})[0];if(v)u.voice=v;
+    btn.setAttribute('aria-pressed','true');
+    u.onend=u.onerror=function(){btn.setAttribute('aria-pressed','false')};
+    ss.speak(u);
+  }catch(e){btn.setAttribute('aria-pressed','false')}
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-act]');
+  if(!b||b.tagName==='INPUT')return;
+  var a=b.getAttribute('data-act'),v=b.getAttribute('data-v');
+  var keep=(a==='unlock'||a==='resetnb'||a==='reveal'||a==='teacher'||a==='dmenu');
+  if(!keep&&pend){pend=''}
+  switch(a){
+   case 'n':S.n=+v;if(S.me>S.n)S.me=S.n;save();render();break;
+   case 'me':S.me=+v;save();render();break;
+   case 'start':S.started=true;tab='caso';save();render();window.scrollTo(0,0);break;
+   case 'restart':S.started=false;save();render();window.scrollTo(0,0);break;
+   case 'tab':go(v);break;
+   case 'round':if(+v<=S.unlocked){round=+v;pend='';render();window.scrollTo(0,0)}break;
+   case 'unlock':
+     if(pend==='unlock'+v){S.unlocked=Math.max(S.unlocked,+v);round=+v;pend='';save();tab='indizi';render();window.scrollTo(0,0)}
+     else{pend='unlock'+v;render()}
+     break;
+   case 'en':S.en=!S.en;save();render();break;
+   case 'glos':openGlossary();break;
+   case 'closeglos':$('#gl').hidden=true;document.body.style.overflow='';break;
+   case 'w':
+     var card=b.closest('.card'),g=$('.gloss',card);
+     if(g){g.textContent=b.textContent+' = '+b.getAttribute('data-t');g.hidden=false}
+     break;
+   case 'ent':
+     var c2=b.closest('.card'),id=c2.getAttribute('data-id'),en=$('.en',c2);
+     var open=en.hidden;en.hidden=!open;openEn[id]=open;b.setAttribute('aria-expanded',open?'true':'false');
+     break;
+   case 'say':speak(b.closest('.card'),b);break;
+   case 'mark':
+     var s=b.getAttribute('data-s'),k=b.getAttribute('data-k');
+     S.marks[s]=S.marks[s]||{};
+     var cur=S.marks[s][k]||'',nx=cur===''?'y':cur==='y'?'n':'';
+     S.marks[s][k]=nx;save();
+     b.className='cell '+nx;b.textContent=nx==='y'?'Sì':nx==='n'?'No':'?';
+     break;
+   case 'resetnb':
+     if(pend==='resetnbx'){S.marks={};pend='';save();render()}else{pend='resetnbx';render()}
+     break;
+   case 'accuse':doAccuse();break;
+   case 'hint':hintShown=true;render();break;
+   case 'reveal':
+     if(pend==='revealx'){S.revealed=true;pend='';save();render();window.scrollTo(0,0)}else{pend='revealx';render()}
+     break;
+   case 'again':
+     S.marks={};S.attempts=0;S.solved=false;S.revealed=false;S.unlocked=1;S.started=false;
+     selSus='';selProofs={};hintShown=false;resHtml='';openEn={};tab='caso';round=2;save();render();window.scrollTo(0,0);
+     break;
+   case 'teacher':
+     if(pend==='teacherx'){teacherOpen=!teacherOpen;pend=''}else{pend='teacherx';if(teacherOpen)teacherOpen=false}
+     render();
+     break;
+  }
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target;if(!t||!t.getAttribute)return;
+  var a=t.getAttribute('data-act');
+  if(a==='pick')selSus=t.value;
+  if(a==='proof')selProofs[t.value]=t.checked;
+});
+document.addEventListener('input',function(ev){
+  if(ev.target&&ev.target.id==='gs'&&GL){$('#gl-list').innerHTML=glList(ev.target.value)}
+});
+
+function doAccuse(){
+  var picked=Object.keys(selProofs).filter(function(k){return selProofs[k]});
+  var box=$('#res');
+  if(!selSus||picked.length!==3){
+    box.innerHTML='<div class="msg" role="alert"><span lang="it">Scegliete una persona e tre prove.</span><span class="e" lang="en">Choose one person and three proofs.</span></div>';
+    return;
+  }
+  var okProofs=picked.every(function(k){return PROOFS.filter(function(p){return p.k===k})[0].ok});
+  if(selSus===META.culprit&&okProofs){S.solved=true;save();render();window.scrollTo(0,0);return}
+  S.attempts++;save();
+  resHtml='<div class="msg" role="alert"><span lang="it">Non ancora. Il colpevole o le prove non sono giusti. Guardate il taccuino.</span><span class="e" lang="en">Not yet. The culprit or the proofs are not right. Look at the notebook.</span></div>';
+  render();
+  var r=$('#res');if(r)r.scrollIntoView({block:'center'});
+}
+
+/* ---------- deck mode ---------- */
+var selDP=-1,selDS='',dEx='',dMsg=null;
+function newDeck(){return {n:1,names:[],expert:false,started:false,idx:0,turn:0,g:{},fin:false,puz:{},tab:'carte'}}
+function dk(){if(!S.deck)S.deck=newDeck();return S.deck}
+function pname(p){var d=dk();var s=(d.names[p]||'').replace(/^\s+|\s+$/g,'');return s||('Giocatore '+(p+1))}
+function firstClue(){for(var i=0;i<DECK.length;i++){if(DECK[i].t==='clue')return i}return DECK.length}
+function clueById(id){for(var i=0;i<CLUES.length;i++){if(CLUES[i].id===id)return CLUES[i]}return null}
+function castById(id){for(var i=0;i<CAST.length;i++){if(CAST[i].id===id)return CAST[i]}return null}
+function deckTitle(i){var it=DECK[i];if(it.t==='clue')return clueById(it.id).t;return {story:'La storia',map:'Mappa',cast:'Personaggi',puzzle:'Enigma',final:'Fine'}[it.t]}
+function norm(s){return String(s).toLowerCase().replace(/\s+/g,'').replace(/[.,h]/g,':').replace(/^0+(?=\d)/,'')}
+var SPKBTN=TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'';
+
+function headBlock(){
+  return '<div class="stack"><h2>'+esc(META.setupH)+'</h2><p class="it" lang="it">Un giallo da risolvere. Pescate le carte, leggete gli indizi e trovate il colpevole.</p><p class="en" lang="en">A mystery to solve. Draw the cards, read the clues and find the culprit.</p></div>';
+}
+function modeChooser(){
+  var deck=S.mode==='deck';
+  return '<section class="stack"><div class="q" lang="it">Come giocate?<small lang="en">How do you play?</small></div><div class="rounds" style="grid-template-columns:1fr 1fr">'+
+   '<button type="button" class="rd" data-act="mode" data-v="split" aria-pressed="'+(!deck)+'" style="flex-direction:column;text-transform:none"><span>Una squadra</span><small style="color:inherit">Everyone has a phone</small></button>'+
+   '<button type="button" class="rd" data-act="mode" data-v="deck" aria-pressed="'+deck+'" style="flex-direction:column;text-transform:none"><span>Il mazzo</span><small style="color:inherit">One phone, or play alone</small></button></div></section>';
+}
+function deckSetup(){
+  var d=dk(),chips='',i;
+  for(i=1;i<=10;i++)chips+='<button type="button" class="chip" data-act="dn" data-v="'+i+'" aria-pressed="'+(d.n===i)+'">'+i+'</button>';
+  var names='';
+  if(d.n>1)for(i=0;i<d.n;i++)names+='<input class="txt" id="dname'+i+'" type="text" maxlength="20" value="'+esc(d.names[i]||'')+'" placeholder="Giocatore '+(i+1)+'" aria-label="Nome del giocatore '+(i+1)+'">';
+  var rules=[['A turno, pesca una carta e leggila a voce alta.','In turn, draw a card and read it out loud.'],['Scrivi le tue idee nel taccuino.','Write your ideas in the notebook.'],['Quando sai chi è il colpevole, tocca «Ipotesi». Hai due tentativi: la seconda ipotesi annulla la prima.','When you know who the culprit is, tap “Guess”. You have two attempts: the second guess cancels the first.'],['Prima dell\'ultima carta, tutti devono fare un\'ipotesi.','Before the last card, everyone must make a guess.'],['Vince chi indovina con la carta più bassa.','The winner is whoever guesses right with the lowest card number.']];
+  return headBlock()+modeChooser()+
+   '<section class="stack"><div class="q" lang="it">Quanti giocatori siete?<small lang="en">How many players are you? (1 = play alone)</small></div><div class="chips">'+chips+'</div>'+
+   (names?'<div class="q" lang="it">I nomi<small lang="en">Names (optional)</small></div><div class="stack">'+names+'</div>':'')+'</section>'+
+   '<label class="opt"><input type="checkbox" data-act="dexp"'+(d.expert?' checked':'')+'><span lang="it">Versione per esperti: scrivi una breve spiegazione con l\'ipotesi.<span class="e" lang="en">Expert version: write a short explanation with your guess.</span></span></label>'+
+   '<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+rules.map(function(r){return '<li>'+esc(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>'+
+   '<button type="button" class="btn tape" data-act="dstart">Inizia<small>Start</small></button>'+
+   '<button type="button" class="link" data-act="teacher">Per l\'insegnante / For the teacher</button>'+(teacherOpen?'<div class="card"><h3>Soluzione / Solution</h3><p>'+esc(META.teacher)+'</p></div>':'');
+}
+function castCard(i,it){
+  var open=S.en||openEn['d-'+i],its='',ens='';
+  it.ids.forEach(function(id){var c=castById(id);
+    its+='<div class="who"><div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div><div><b>'+esc(c.name)+'</b><span lang="it">'+c.age+' anni · '+esc(c.role)+'</span></div></div><p class="it" lang="it">'+mk(c.desc)+'</p>';
+    ens+='<p lang="en"><b>'+esc(c.name)+'</b>: '+c.age+', '+esc(c.roleEn)+'. '+esc(c.descEn)+'</p>';});
+  return '<article class="card" data-id="d-'+i+'"><div class="card-h"><span class="tag">Carta '+(i+1)+' · Personaggi</span>'+SPKBTN+'</div>'+its+'<div class="gloss" hidden></div><button type="button" class="entog" data-act="ent" aria-expanded="'+(open?'true':'false')+'">English</button><div class="en" '+(open?'':'hidden')+'>'+ens+'</div></article>';
+}
+function deckCardHtml(i){
+  var it=DECK[i],d=dk(),tag='Carta '+(i+1);
+  if(it.t==='story')return cardHtml('d-'+i,tag+' · La storia','',STORY.it,STORY.en);
+  if(it.t==='map')return META.caso||'';
+  if(it.t==='cast')return castCard(i,it);
+  if(it.t==='clue'){var c=clueById(it.id);return cardHtml('d-'+i,tag+' · Indizio',c.t,c.it,c.en)}
+  if(it.t==='final')return cardHtml('d-'+i,tag+' · Fine','',it.it,it.en);
+  if(it.t==='puzzle'){
+    var h=cardHtml('d-'+i,tag+' · Enigma','',it.it,it.en);
+    var ex='<div class="row" style="flex-wrap:nowrap"><input class="txt" id="pz'+i+'" type="text" autocomplete="off" placeholder="Risposta / Answer" aria-label="Risposta"><button type="button" class="btn ghost" data-act="pz" data-v="'+i+'" style="flex:none">Controlla</button></div><div id="pzr'+i+'" aria-live="polite">'+(d.puz[i]?'<b>Esatto! / Correct!</b>':'')+'</div>';
+    return h.replace(/<\/article>$/,ex+'</article>');
+  }
+  return '';
+}
+function deckCarte(){
+  var d=dk(),N=DECK.length,h='<h2>Le carte</h2>';
+  h+='<div><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="'+N+'" aria-valuenow="'+d.idx+'"><i style="width:'+Math.round(d.idx/N*100)+'%"></i></div><small>Carta '+d.idx+' di '+N+' · Card '+d.idx+' of '+N+'</small></div>';
+  if(d.idx===0)h+='<div class="card"><p class="it" lang="it">Il mazzo è pronto. Pesca la prima carta e leggila a voce alta.</p><p class="en" lang="en">The deck is ready. Draw the first card and read it out loud.</p></div>';
+  else h+=deckCardHtml(d.idx-1);
+  var nx=DECK[d.idx];
+  if(nx){
+    var missing=[];
+    if(nx.t==='final'){for(var p=0;p<d.n;p++){if(!(d.g[p]&&d.g[p].att>0))missing.push(pname(p))}}
+    if(missing.length){
+      h+='<div class="card ask"><p class="it" lang="it">Prima dell\'ultima carta, tutti devono fare un\'ipotesi. Mancano: <b>'+esc(missing.join(', '))+'</b>.</p><p class="en" lang="en">Before the last card, everyone must make a guess. Still missing: '+esc(missing.join(', '))+'.</p></div>';
+      h+='<button type="button" class="btn tape" data-act="dtab" data-v="ipotesi">Fai l\'ipotesi<small>Make your guess</small></button>';
+    }else{
+      if(d.n>1)h+='<div class="turn"><span lang="it">Turno di <b>'+esc(pname(d.turn))+'</b></span><small lang="en">Draw the next card and read it aloud</small></div>';
+      h+='<button type="button" class="btn tape" data-act="ddraw">'+(nx.t==='final'?'Pesca l\'ultima carta':'Pesca la carta successiva')+'<small>'+(nx.t==='final'?'Draw the last card':'Draw the next card')+'</small></button>';
+    }
+  }
+  if(d.idx>=firstClue())h+='<button type="button" class="btn ghost" data-act="dtab" data-v="ipotesi">So chi è il colpevole!<small>I know who the culprit is!</small></button>';
+  if(d.idx>1){
+    h+='<h3 lang="it" style="margin-top:6px">Carte sul tavolo</h3>';
+    for(var i=d.idx-2;i>=0;i--)h+='<details class="old"><summary>Carta '+(i+1)+' · '+esc(deckTitle(i))+'</summary>'+deckCardHtml(i)+'</details>';
+  }
+  h+=confirmBtnGhost('dmenu','x','Torna al menu','Back to menu');
+  return h;
+}
+function deckIpotesi(){
+  var d=dk(),h='<h2>Ipotesi</h2>',p;
+  if(d.idx<firstClue())return h+'<div class="card"><p class="it" lang="it">Prima pescate le carte dei personaggi. Poi potete fare un\'ipotesi.</p><p class="en" lang="en">First draw the character cards. Then you can make a guess.</p></div>';
+  h+='<p class="it" lang="it">Hai due tentativi. La seconda ipotesi annulla la prima. Nessuno vede la tua risposta.</p><p class="en" lang="en">You have two attempts. The second guess cancels the first. Nobody sees your answer.</p>';
+  if(dMsg)h+='<div class="msg" role="status"><span lang="it">'+esc(dMsg[0])+'</span><span class="e" lang="en">'+esc(dMsg[1])+'</span></div>';
+  if(d.n===1)selDP=0;
+  else{
+    h+='<div class="stack"><div class="q" lang="it">Chi fa l\'ipotesi?<small lang="en">Who is guessing?</small></div>';
+    for(p=0;p<d.n;p++){var a=(d.g[p]&&d.g[p].att)||0;h+='<button type="button" class="rd" style="justify-content:space-between;padding:0 14px" data-act="dsel" data-v="'+p+'" aria-pressed="'+(selDP===p)+'" aria-disabled="'+(a>=2)+'"><span>'+esc(pname(p))+'</span><span>'+a+'/2</span></button>'}
+    h+='</div>';
+  }
+  if(selDP>=0){
+    var att=(d.g[selDP]&&d.g[selDP].att)||0;
+    if(att>=2)return h+'<div class="card"><p class="it" lang="it">'+esc(pname(selDP))+' ha finito i tentativi.</p><p class="en" lang="en">No attempts left.</p></div>';
+    if(att===1)h+='<div class="card ask"><p class="it" lang="it">Questa è la seconda ipotesi: annulla la prima.</p><p class="en" lang="en">This is the second guess: it cancels the first.</p></div>';
+    h+='<fieldset style="border:0;padding:0;margin:0" class="stack"><legend class="q" lang="it" style="padding:0 0 8px">Il colpevole<small lang="en">The culprit</small></legend>';
+    CAST.forEach(function(c){h+='<label class="opt"><input type="radio" name="dsus" data-act="dsus" value="'+c.id+'"'+(selDS===c.id?' checked':'')+'><span><b>'+esc(c.name)+'</b><span class="e">'+esc(c.roleEn)+'</span></span></label>'});
+    h+='</fieldset>';
+    if(d.expert)h+='<div class="stack"><label class="q" for="dexpl" lang="it">La tua spiegazione<small lang="en">Your short explanation</small></label><textarea class="txt" id="dexpl" maxlength="400" placeholder="Perché?">'+esc(dEx)+'</textarea></div>';
+    h+='<button type="button" class="btn tape" data-act="dsave">Salva l\'ipotesi<small>Carta '+d.idx+' · Save guess</small></button>';
+  }
+  return h;
+}
+function deckRisultati(){
+  var d=dk(),h='<span class="stamp">Caso chiuso</span><h2>Risultati</h2>',p,fi=DECK.length-1;
+  h+=deckCardHtml(fi);
+  h+=cardHtml('sol','Soluzione','',SOL.it,SOL.en);
+  h+='<div class="card"><div class="card-h"><span class="tag">Le prove</span></div><ol class="steps">'+META.solProofs.map(function(x){return '<li>'+esc(x[0])+'<span lang="en">'+esc(x[1])+'</span></li>'}).join('')+'</ol></div>';
+  var best=1e9,win=[],rows='';
+  for(p=0;p<d.n;p++){var g=d.g[p];if(g&&g.sus===META.culprit){if(g.card<best){best=g.card;win=[p]}else if(g.card===best)win.push(p)}}
+  h+='<div class="card"><div class="card-h"><span class="tag">Chi vince?</span></div>';
+  if(win.length)h+='<p class="it" lang="it">'+(d.n>1?(win.length>1?'Vincono: ':'Vince: ')+'<b>'+esc(win.map(pname).join(', '))+'</b>':'<b>Bravo!</b> Hai trovato il colpevole')+' con la carta <b>'+best+'</b>.</p><p class="en" lang="en">'+(d.n>1?'Winner: '+esc(win.map(pname).join(', ')):'Well done! You found the culprit')+' at card '+best+'.</p>';
+  else h+='<p class="it" lang="it">Nessuno ha trovato il colpevole.</p><p class="en" lang="en">Nobody found the culprit.</p>';
+  h+='</div>';
+  for(p=0;p<d.n;p++){var gg=d.g[p],c=gg?castById(gg.sus):null;
+    rows+='<tr><td>'+esc(pname(p))+'</td><td>'+(c?esc(c.name.split(' ')[0]):'–')+'</td><td class="c">'+(gg?gg.card:'–')+'</td><td class="c">'+(gg?(gg.sus===META.culprit?'Sì':'No'):'–')+'</td></tr>';
+    if(d.expert&&gg&&gg.expl)rows+='<tr><td colspan="4"><small>'+esc(gg.expl)+'</small></td></tr>';}
+  h+='<div class="tw"><table class="tt"><thead><tr><th>Giocatore</th><th>Ipotesi</th><th>Carta</th><th>Giusto?</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var pz='';DECK.forEach(function(it,i){if(it.t==='puzzle')pz+='<li>Carta '+(i+1)+': <b>'+esc(it.ans[0])+'</b> '+(d.puz[i]?'(risolto)':'')+'</li>'});
+  if(pz)h+='<div class="card"><div class="card-h"><span class="tag">Enigmi</span></div><ul class="pl">'+pz+'</ul></div>';
+  h+='<button type="button" class="btn tape" data-act="dagain">Nuova partita<small>New game</small></button>';
+  return h;
+}
+function deckNav(){
+  var d=dk();
+  var T=[['carte','Carte','Cards'],['taccuino','Taccuino','Notebook'],d.fin?['risultati','Risultati','Results']:['ipotesi','Ipotesi','Guess']];
+  return '<nav class="nav" aria-label="Menu"><div class="nav-in" style="grid-template-columns:repeat(3,1fr)">'+T.map(function(t){return '<button type="button" class="tab" data-act="dtab" data-v="'+t[0]+'"'+(d.tab===t[0]?' aria-current="page"':'')+'>'+t[1]+'<small>'+t[2]+'</small></button>'}).join('')+'</div></nav>';
+}
+function renderDeck(){
+  var d=dk();
+  if(d.fin&&d.tab==='ipotesi')d.tab='risultati';
+  var f={carte:deckCarte,taccuino:viewNote,ipotesi:deckIpotesi,risultati:deckRisultati}[d.tab]||deckCarte;
+  $('#app').innerHTML=header()+'<main class="wrap main">'+f()+'</main>'+deckNav();
+}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-act]');
+  if(!b||b.tagName==='INPUT')return;
+  var a=b.getAttribute('data-act'),v=b.getAttribute('data-v'),d;
+  switch(a){
+   case 'mode':S.mode=v;if(v==='deck')dk();save();render();break;
+   case 'dn':d=dk();d.n=+v;save();render();break;
+   case 'dstart':d=dk();d.started=true;d.idx=0;d.turn=0;d.g={};d.fin=false;d.puz={};d.tab='carte';selDP=-1;selDS='';dEx='';dMsg=null;save();render();window.scrollTo(0,0);break;
+   case 'dtab':d=dk();d.tab=v;dMsg=null;save();render();window.scrollTo(0,0);break;
+   case 'ddraw':
+     d=dk();
+     if(DECK[d.idx]){
+       if(DECK[d.idx].t==='final'){for(var p=0;p<d.n;p++){if(!(d.g[p]&&d.g[p].att>0)){render();return}}}
+       d.idx++;d.turn=(d.turn+1)%d.n;
+       if(DECK[d.idx-1].t==='final'){d.fin=true;d.tab='risultati'}
+       save();render();window.scrollTo(0,0);
+     }
+     break;
+   case 'dsel':d=dk();selDP=+v;selDS='';dEx='';dMsg=null;render();break;
+   case 'dsave':
+     d=dk();
+     var ex=document.getElementById('dexpl');if(ex)dEx=ex.value;
+     var att=(d.g[selDP]&&d.g[selDP].att)||0;
+     if(selDP<0||att>=2){break}
+     if(!selDS){dMsg=['Scegli una persona.','Choose a person.'];render();break}
+     if(d.expert&&dEx.replace(/\s+/g,'').length<3){dMsg=['Scrivi una breve spiegazione.','Write a short explanation.'];render();break}
+     d.g[selDP]={att:att+1,sus:selDS,card:d.idx,expl:dEx};
+     dMsg=['Ipotesi salvata alla carta '+d.idx+'. Nessuno vede la risposta.','Guess saved at card '+d.idx+'. Nobody sees the answer.'];
+     selDS='';dEx='';if(d.n>1)selDP=-1;
+     save();render();window.scrollTo(0,0);
+     break;
+   case 'pz':
+     d=dk();
+     var inp=document.getElementById('pz'+v),it=DECK[+v],ok=false;
+     if(inp){var val=norm(inp.value);it.ans.forEach(function(x){if(norm(x)===val)ok=true})}
+     var out=document.getElementById('pzr'+v);
+     if(ok){d.puz[v]=true;save();if(out)out.innerHTML='<b>Esatto! / Correct!</b>'}
+     else if(out)out.textContent='Riprova / Try again';
+     break;
+   case 'dagain':S.deck=newDeck();selDP=-1;selDS='';dEx='';dMsg=null;save();render();window.scrollTo(0,0);break;
+   case 'dmenu':
+     if(pend==='dmenux'){d=dk();d.started=false;pend='';save();render();window.scrollTo(0,0)}
+     else{pend='dmenux';render()}
+     break;
+  }
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target;if(!t||!t.getAttribute)return;
+  var a=t.getAttribute('data-act');
+  if(a==='dsus')selDS=t.value;
+  if(a==='dexp'){dk().expert=t.checked;save()}
+});
+document.addEventListener('input',function(ev){
+  var t=ev.target;if(!t||!t.id)return;
+  if(t.id==='dexpl')dEx=t.value;
+  if(t.id.indexOf('dname')===0){dk().names[+t.id.slice(5)]=t.value;save()}
+});
+
+render();
+})();
+</script>
+</body></html>
