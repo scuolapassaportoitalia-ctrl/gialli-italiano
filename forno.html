@@ -146,6 +146,12 @@ textarea.txt{min-height:96px;padding:10px 12px;resize:vertical}
 details.old{background:var(--surface);border:1px solid var(--line);border-radius:6px}
 details.old summary{min-height:48px;display:flex;align-items:center;padding:0 14px;font-weight:700;cursor:pointer}
 details.old .card{border:0;border-top:1px solid var(--line);border-radius:0}
+.fig{margin:0;display:flex;flex-direction:column;gap:6px}
+.fig img,.fig svg{display:block;width:100%;max-width:100%;height:auto;border-radius:4px;border:1px solid var(--line);background:#fff}
+.fig.sm{max-width:260px}
+.fig figcaption{font-size:14px;color:var(--muted)}
+img.av{object-fit:cover;object-position:top center;background:#cde;border:2px solid var(--line)}
+span.av{background:none}
 </style>
 
 <div id="app"></div>
@@ -284,6 +290,67 @@ var DECK=[{t:'story'},{t:'cast',ids:['nicola','marta']},{t:'cast',ids:['franco',
 {t:'clue',id:'4.6'},{t:'clue',id:'3.6'},{t:'clue',id:'4.7'},
 {t:'final',it:"L'ispettrice Bruno ha tutti gli elementi per [accusare|accuse] il colpevole, anche grazie alle vostre idee. Ora leggete la soluzione.",en:'Inspector Bruno has everything she needs to accuse the culprit, also thanks to your ideas. Now read the solution.'}];
 
+var INK='#15202B';
+function keyG(x,y,c){return '<g transform="translate('+x+' '+y+')"><circle cx="10" cy="10" r="9" fill="none" stroke="'+c+'" stroke-width="5"/><path d="M19 10h36M45 10v9M52 10v8" stroke="'+c+'" stroke-width="5" stroke-linecap="round"/></g>'}
+var IMGS={
+ scena:fig(S(320,140,'<rect width="320" height="140" fill="#9fd0e6"/><circle cx="270" cy="26" r="14" fill="#f2c300"/><rect y="104" width="320" height="36" fill="#2f7fa0"/><rect x="76" y="20" width="22" height="90" fill="#e8d9b5"/><path d="M76 20l11-14 11 14z" fill="#B3261E"/><rect x="82" y="34" width="10" height="14" fill="#2b1d16"/><rect x="8" y="58" width="62" height="52" fill="#efe6cf"/><rect x="18" y="68" width="14" height="16" fill="#7fb5d6"/><rect x="44" y="68" width="14" height="16" fill="#7fb5d6"/><rect x="110" y="46" width="104" height="64" fill="#d9a441"/><rect x="110" y="34" width="104" height="14" fill="#8b5a3c"/><text x="162" y="45" text-anchor="middle" font-size="10" font-weight="800" fill="#f7f1e1" font-family="sans-serif">FORNO LORUSSO</text><rect x="126" y="68" width="30" height="42" fill="#2b1d16"/><rect x="168" y="68" width="34" height="22" fill="#7fb5d6"/><rect x="232" y="54" width="80" height="56" fill="#e8d9b5"/><rect x="244" y="66" width="14" height="16" fill="#7fb5d6"/><rect x="278" y="66" width="14" height="16" fill="#7fb5d6"/>','Bari Vecchia con il forno'),'Bari Vecchia','Old town of Bari'),
+ piano:fig(S(320,190,'<rect x="10" y="10" width="300" height="170" fill="#f7f1e1" stroke="'+INK+'" stroke-width="5"/><rect x="12" y="12" width="176" height="76" fill="#f3d9a8"/><rect x="190" y="12" width="118" height="76" fill="#d8dee3"/><rect x="12" y="92" width="296" height="86" fill="#f7ecd0"/><path d="M10 90h300M190 10v80" stroke="'+INK+'" stroke-width="4"/><text x="100" y="56" text-anchor="middle" font-size="16" font-weight="800" fill="'+INK+'" font-family="sans-serif">FORNO</text><text x="249" y="46" text-anchor="middle" font-size="14" font-weight="800" fill="'+INK+'" font-family="sans-serif">MAGAZZINO</text><text x="160" y="136" text-anchor="middle" font-size="16" font-weight="800" fill="'+INK+'" font-family="sans-serif">NEGOZIO</text><rect x="130" y="176" width="60" height="9" fill="#8b5a3c"/><text x="160" y="163" text-anchor="middle" font-size="11" fill="'+INK+'" font-family="sans-serif">porta davanti</text><rect x="305" y="34" width="10" height="44" fill="#f2c300" stroke="'+INK+'" stroke-width="2"/><text x="299" y="30" text-anchor="end" font-size="11" fill="'+INK+'" font-family="sans-serif">porta dietro</text>','Pianta del forno'),'Il forno visto dall\'alto','The bakery from above'),
+ fridge:fig(S(160,100,'<rect x="52" y="6" width="56" height="88" rx="6" fill="#dfe6ea" stroke="'+INK+'" stroke-width="4"/><path d="M52 38h56" stroke="'+INK+'" stroke-width="3"/><path d="M98 16v14M98 48v22" stroke="'+INK+'" stroke-width="4" stroke-linecap="round"/><path d="M66 52l10 8-8 8 12 8" fill="none" stroke="#B3261E" stroke-width="3" stroke-linecap="round"/>','Frigorifero rotto'),'Il frigorifero rotto: 500 €','The broken fridge: 500 €','sm'),
+ timer:fig(S(160,100,'<rect x="70" y="4" width="20" height="9" rx="3" fill="'+INK+'"/><circle cx="80" cy="48" r="32" fill="#f7f1e1" stroke="'+INK+'" stroke-width="4"/><path d="M80 48V30M80 48l14 8" stroke="'+INK+'" stroke-width="4" stroke-linecap="round"/><path d="M80 20v4M80 72v4M52 48h4M104 48h4" stroke="'+INK+'" stroke-width="3"/><text x="80" y="97" text-anchor="middle" font-size="13" font-weight="700" fill="'+INK+'" font-family="monospace">5:40</text>','Timer del forno alle 5:40'),'Il timer suona','The timer rings','sm'),
+ oven:fig(S(160,100,'<rect x="30" y="6" width="100" height="88" rx="8" fill="#8b5a3c" stroke="'+INK+'" stroke-width="4"/><rect x="42" y="30" width="76" height="52" rx="5" fill="#2b1d16"/><rect x="48" y="42" width="64" height="8" rx="2" fill="#e0a640"/><rect x="48" y="60" width="64" height="8" rx="2" fill="#e0a640"/><circle cx="48" cy="18" r="4" fill="#f2c300"/><circle cx="62" cy="18" r="4" fill="#f2c300"/><text x="118" y="22" text-anchor="end" font-size="11" font-weight="700" fill="#f7f1e1" font-family="monospace">5:00</text>','Forno con le focacce'),'Focacce nel forno alle 5:00','Focaccias in the oven at 5:00','sm'),
+ doors:fig(S(160,100,'<rect x="12" y="6" width="54" height="80" fill="#8b5a3c" stroke="'+INK+'" stroke-width="4"/><circle cx="56" cy="48" r="4" fill="#f2c300"/><rect x="94" y="6" width="54" height="80" fill="#2b1d16"/><path d="M94 6l34 8v62l-34 6z" fill="#a9703f" stroke="'+INK+'" stroke-width="4"/><circle cx="102" cy="48" r="3" fill="#f2c300"/><text x="39" y="97" text-anchor="middle" font-size="9" font-weight="700" fill="'+INK+'" font-family="sans-serif">DAVANTI: chiusa</text><text x="121" y="97" text-anchor="middle" font-size="9" font-weight="700" fill="'+INK+'" font-family="sans-serif">DIETRO: aperta</text>','Porta davanti chiusa e porta dietro aperta'),'Le due porte','The two doors','sm'),
+ keys:fig(S(160,100,keyG(8,8,'#b8860b')+keyG(90,8,'#2f6f8f')+keyG(8,54,'#8a4f7d')+keyG(90,54,'#9a6b2f')+'<g font-size="11" font-weight="700" fill="'+INK+'" font-family="sans-serif"><text x="8" y="40">Rosa</text><text x="90" y="40">Nicola</text><text x="8" y="86">Marta</text><text x="90" y="86">Franco</text></g>','Quattro chiavi'),'Quattro chiavi','Four keys','sm'),
+ weapon:fig(S(160,100,'<path d="M20 38h60l4 56H16z" fill="#f1ead8" stroke="'+INK+'" stroke-width="4"/><path d="M20 38q30-10 60 0" fill="#e4dcc4" stroke="'+INK+'" stroke-width="4"/><text x="50" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="'+INK+'" font-family="sans-serif">FARINA</text><g transform="rotate(-30 92 40)"><rect x="60" y="20" width="76" height="14" rx="7" fill="#c9a06a" stroke="'+INK+'" stroke-width="3"/><rect x="42" y="24" width="22" height="6" rx="3" fill="#c9a06a" stroke="'+INK+'" stroke-width="3"/><rect x="132" y="24" width="22" height="6" rx="3" fill="#c9a06a" stroke="'+INK+'" stroke-width="3"/></g>','Mattarello nel sacco della farina'),'Il mattarello nel sacco','The rolling pin in the bag','sm'),
+ button:fig(S(160,100,'<circle cx="40" cy="50" r="26" fill="#2f5fa8" stroke="'+INK+'" stroke-width="4"/><circle cx="40" cy="50" r="17" fill="none" stroke="#1c3c70" stroke-width="3"/><circle cx="33" cy="44" r="3" fill="'+INK+'"/><circle cx="47" cy="44" r="3" fill="'+INK+'"/><circle cx="33" cy="56" r="3" fill="'+INK+'"/><circle cx="47" cy="56" r="3" fill="'+INK+'"/><path d="M94 20l12-8 14 12 14-12 12 8 8 24-12 6v40H90V50l-12-6z" fill="#2f5fa8" stroke="'+INK+'" stroke-width="3"/><circle cx="120" cy="40" r="4" fill="'+INK+'"/><circle cx="120" cy="56" r="4" fill="'+INK+'"/><circle cx="120" cy="72" r="5" fill="none" stroke="#f7f1e1" stroke-width="2" stroke-dasharray="3 2"/>','Bottone blu e giacca di Dario'),'Il bottone blu','The blue button','sm'),
+ receipt:fig(S(160,100,'<path d="M44 4h72v90l-9-6-9 6-9-6-9 6-9-6-9 6-9-6z" fill="#fff" stroke="'+INK+'" stroke-width="3"/><text x="80" y="20" text-anchor="middle" font-size="9" font-weight="700" fill="'+INK+'" font-family="monospace">MERCATO PESCE</text><text x="80" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="'+INK+'" font-family="monospace">MOLFETTA</text><path d="M54 44h52M54 54h52M54 64h34" stroke="#9aa5ad" stroke-width="3"/><text x="80" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="'+INK+'" font-family="monospace">ore 5:30</text>','Ricevuta di Molfetta'),'La ricevuta di Molfetta','The receipt from Molfetta','sm'),
+ photos:fig(S(160,100,'<g transform="rotate(-6 45 50)"><rect x="10" y="8" width="62" height="84" fill="#fff" stroke="'+INK+'" stroke-width="3"/><rect x="16" y="14" width="50" height="50" fill="#9fd0e6"/><path d="M16 52q12-8 25 0t25 0v12H16z" fill="#2f7fa0"/><circle cx="41" cy="30" r="5" fill="#f2c300"/><text x="41" y="82" text-anchor="middle" font-size="10" font-weight="700" fill="'+INK+'" font-family="monospace">5:15</text></g><g transform="rotate(6 115 50)"><rect x="84" y="8" width="62" height="84" fill="#fff" stroke="'+INK+'" stroke-width="3"/><rect x="90" y="14" width="50" height="50" fill="#9fd0e6"/><path d="M90 52q12-8 25 0t25 0v12H90z" fill="#2f7fa0"/><circle cx="115" cy="30" r="5" fill="#f2c300"/><text x="115" y="82" text-anchor="middle" font-size="10" font-weight="700" fill="'+INK+'" font-family="monospace">5:45</text></g>','Due foto sul Lungomare'),'Due foto sul Lungomare','Two photos on the seafront','sm'),
+ flowers:fig(S(160,100,'<rect x="20" y="34" width="120" height="60" fill="#f1ead8" stroke="'+INK+'" stroke-width="3"/><path d="M14 34h132l-8-26H22z" fill="#3F7D4F" stroke="'+INK+'" stroke-width="3"/><path d="M46 8l-4 26M72 8l-2 26M98 8l2 26M124 8l4 26" stroke="#f1ead8" stroke-width="6"/><circle cx="40" cy="56" r="7" fill="#e0527a"/><circle cx="56" cy="52" r="7" fill="#f2c300"/><circle cx="72" cy="56" r="7" fill="#e0527a"/><path d="M40 63v28M56 59v32M72 63v28" stroke="#3F7D4F" stroke-width="3"/><rect x="92" y="52" width="36" height="38" fill="#fff" stroke="'+INK+'" stroke-width="2"/><path d="M98 62h24M98 70h24" stroke="#9aa5ad" stroke-width="2"/><text x="110" y="85" text-anchor="middle" font-size="8" font-weight="700" fill="'+INK+'" font-family="monospace">5:45</text>','Negozio di fiori di Elena'),'Il negozio di Elena','Elena\'s flower shop','sm'),
+ video:fig(S(160,100,'<rect x="34" y="6" width="92" height="60" rx="5" fill="#1f2a35" stroke="'+INK+'" stroke-width="4"/><rect x="40" y="12" width="80" height="48" fill="#3a5a78"/><circle cx="80" cy="30" r="8" fill="#e8b895"/><path d="M64 60c0-12 7-18 16-18s16 6 16 18z" fill="#f2f2f2"/><circle cx="48" cy="22" r="4" fill="#d33"/><text x="55" y="26" font-size="9" font-weight="700" fill="#fff" font-family="monospace">REC</text><path d="M20 76h120l-8 14H28z" fill="#9aa5ad" stroke="'+INK+'" stroke-width="3"/>','Videochiamata registrata'),'Videochiamata con New York','Video call with New York','sm'),
+ van:fig(S(160,100,'<rect x="10" y="32" width="88" height="42" rx="5" fill="#f1ead8" stroke="'+INK+'" stroke-width="3"/><path d="M98 42h24l16 18v14H98z" fill="#c9d6de" stroke="'+INK+'" stroke-width="3"/><rect x="106" y="46" width="14" height="12" fill="#7fb5d6"/><circle cx="36" cy="76" r="10" fill="'+INK+'"/><circle cx="116" cy="76" r="10" fill="'+INK+'"/><circle cx="36" cy="76" r="4" fill="#9aa5ad"/><circle cx="116" cy="76" r="4" fill="#9aa5ad"/><path d="M130 4c-8 0-13 6-13 13 0 9 13 20 13 20s13-11 13-20c0-7-5-13-13-13z" fill="#B3261E" stroke="'+INK+'" stroke-width="2"/><circle cx="130" cy="17" r="4" fill="#fff"/><text x="54" y="58" text-anchor="middle" font-size="12" font-weight="800" fill="'+INK+'" font-family="sans-serif">DARIO</text>','Furgone di Dario con GPS'),'Il furgone e il GPS','The van and the GPS','sm')
+};
+var CLUE_IMG={'2.5':IMGS.fridge,'3.2':IMGS.timer,'3.3':IMGS.oven,'3.4':IMGS.doors,'3.5':IMGS.keys,'3.6':IMGS.weapon,'3.7':IMGS.button,'4.1':IMGS.receipt,'4.2':IMGS.photos,'4.3':IMGS.flowers,'4.4':IMGS.video,'4.5':IMGS.van};
+var PDFIMG={};var CAST_IMG={};
+var CAST_FACES={
+ nicola:{skin:'#e0ac86',hair:'#3b2a20',style:'short',shirt:'#2F6F8F',bg:'#d9e6ee'},
+ marta:{skin:'#e8b895',hair:'#5a2f1d',style:'long',shirt:'#8A4F7D',bg:'#efe1ee'},
+ franco:{skin:'#d99f7b',hair:'#b9b9b9',style:'short',stache:true,shirt:'#f2f2f2',bg:'#efe6cf'},
+ elena:{skin:'#e6b490',hair:'#8a3b2a',style:'bun',shirt:'#3F7D4F',bg:'#e3f0e3'},
+ dario:{skin:'#e0ac86',hair:'#222',style:'cap',cap:'#2f5fa8',shirt:'#3D5BA8',bg:'#dfe8f5'},
+ giulia:{skin:'#e8b895',hair:'#1f1b18',style:'long',glasses:true,shirt:'#A84B4B',bg:'#f3e0e0'}
+};
+CAST.forEach(function(c){if(CAST_FACES[c.id])c.face=CAST_FACES[c.id]});
+META.victim.face={skin:'#e6b490',hair:'#c9c9c9',style:'bun',shirt:'#55616B',bg:'#e5e9ec'};
+META.inspector.face={skin:'#d9a07c',hair:'#2a2a2a',style:'short',shirt:'#34495E',bg:'#d8e0e8'};
+META.caso=IMGS.piano.replace('<figure','<div class="card"><div class="card-h"><span class="tag">Mappa</span></div><figure')+'</div>';
+DECK.splice(1,0,{t:'map'});
+
+function fig(inner,it,en,cls){return '<figure class="fig '+(cls||'')+'">'+inner+'<figcaption><span lang="it">'+it+'</span> · <span lang="en">'+en+'</span></figcaption></figure>'}
+function S(w,h,body,label){return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+label+'" xmlns="http://www.w3.org/2000/svg">'+body+'</svg>'}
+function faceSVG(f,size){
+ var s=f.skin,h=f.hair,st=f.style||'short',sh=f.shirt||'#556',bg=f.bg||'#dfe6ea';
+ var o='<svg viewBox="0 0 64 64" width="'+size+'" height="'+size+'" aria-hidden="true"><rect width="64" height="64" fill="'+bg+'"/>';
+ if(st==='long')o+='<path d="M13 34C12 14 22 8 32 8s20 6 19 26v20H13z" fill="'+h+'"/>';
+ o+='<path d="M7 64c0-13 10-19 25-19s25 6 25 19z" fill="'+sh+'"/><rect x="27" y="38" width="10" height="10" rx="3" fill="'+s+'"/><ellipse cx="32" cy="29" rx="12" ry="14" fill="'+s+'"/>';
+ if(st==='short')o+='<path d="M19.5 28C18 14 25 9 32 9s14 5 12.5 19c-2-6-6-9-12.5-9s-10.5 3-12.5 9z" fill="'+h+'"/>';
+ if(st==='long')o+='<path d="M20 28c0-9 5-13 12-13s12 4 12 13c-3-4-7-6-12-6s-9 2-12 6z" fill="'+h+'"/>';
+ if(st==='bun')o+='<circle cx="32" cy="8" r="6" fill="'+h+'"/><path d="M19.5 28C18 14 25 10 32 10s14 4 12.5 18c-2-6-6-9-12.5-9s-10.5 3-12.5 9z" fill="'+h+'"/>';
+ if(st==='cap'){var cc=f.cap||'#2f5fa8';o+='<path d="M18 23c0-10 6-15 14-15s14 5 14 15z" fill="'+cc+'"/><rect x="15" y="22" width="34" height="4" rx="2" fill="'+cc+'"/>'}
+ o+='<circle cx="27" cy="29" r="1.7" fill="#1d1d1d"/><circle cx="37" cy="29" r="1.7" fill="#1d1d1d"/>';
+ if(f.beard)o+='<path d="M20 32c0 10 5 15 12 15s12-5 12-15c-3 4-7 5-12 5s-9-1-12-5z" fill="'+h+'"/>';
+ if(f.stache||f.beard)o+='<path d="M26 34q6-3 12 0q-6 2-12 0z" fill="'+h+'"/>';
+ o+='<path d="M28 39q4 2.5 8 0" stroke="#7a3b3b" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+ if(f.glasses)o+='<circle cx="27" cy="29" r="4.2" fill="none" stroke="#222" stroke-width="1.3"/><circle cx="37" cy="29" r="4.2" fill="none" stroke="#222" stroke-width="1.3"/><path d="M31.2 29h1.6" stroke="#222" stroke-width="1.3"/>';
+ return o+'</svg>'}
+function avHtml(c){
+ if(c.img)return '<img class="av" alt="" src="'+c.img+'">';
+ if(c.face)return '<span class="av" style="background:none;overflow:hidden" aria-hidden="true">'+faceSVG(c.face,52)+'</span>';
+ return '<div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div>'}
+function avMeta(m){
+ if(m.img)return '<img class="av" alt="" src="'+m.img+'">';
+ if(m.face)return '<span class="av" style="background:none;overflow:hidden" aria-hidden="true">'+faceSVG(m.face,52)+'</span>';
+ return '<div class="av" style="background:'+m.color+'" aria-hidden="true">'+m.init+'</div>'}
+function clueImg(id){return (typeof CLUE_IMG!=='undefined'&&CLUE_IMG[id])||''}
+
 /* ---------- state ---------- */
 var KEY=META.key;
 var S={mode:'split',deck:null,n:1,me:1,started:false,unlocked:1,en:false,marks:{},attempts:0,solved:false,revealed:false};
@@ -298,13 +365,13 @@ function mk(s){return esc(s).replace(/\[([^|\]]+)\|([^\]]+)\]/g,function(m,a,b){
 function plain(s){return s.replace(/\[([^|\]]+)\|([^\]]+)\]/g,'$1')}
 function owner(i){return (i%S.n)+1}
 function myClues(r){var out=[];CLUES.forEach(function(c,i){if(c.r===r&&owner(i)===S.me)out.push(c)});return out}
-function cardHtml(id,tag,title,it,en){
+function cardHtml(id,tag,title,it,en,img){
   var open=S.en||openEn[id];
   var its=(Array.isArray(it)?it:[it]).map(function(p){return '<p class="it" lang="it">'+mk(p)+'</p>'}).join('');
   var ens=(Array.isArray(en)?en:[en]).map(function(p){return '<p lang="en">'+esc(p)+'</p>'}).join('');
   return '<article class="card" data-id="'+id+'"><div class="card-h"><span class="tag">'+tag+'</span>'+
     (TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'')+'</div>'+
-    (title?'<h3>'+esc(title)+'</h3>':'')+its+'<div class="gloss" hidden aria-live="polite"></div>'+
+    (title?'<h3>'+esc(title)+'</h3>':'')+(img||'')+its+'<div class="gloss" hidden aria-live="polite"></div>'+
     '<button type="button" class="entog" data-act="ent" aria-expanded="'+(open?'true':'false')+'">English</button>'+
     '<div class="en" '+(open?'':'hidden')+'>'+ens+'</div></article>';
 }
@@ -342,9 +409,9 @@ function teacherHtml(){
    '<small>Consiglio: 5 minuti per Round. Ogni studente legge ad alta voce, poi tutti riassumono in una frase. / Tip: 5 minutes per round. Each student reads aloud, then everyone summarises in one sentence.</small></div>';
 }
 function viewCaso(){
-  var h='<h2>Il caso</h2>'+cardHtml('story','Round 1 · La storia','',STORY.it,STORY.en);
+  var h='<h2>Il caso</h2>'+cardHtml('story','Round 1 · La storia','',STORY.it,STORY.en,IMGS.scena||'');
   h+='<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+RULES.map(function(r){return '<li>'+mk(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>';
-  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who"><div class="av" style="background:'+META.victim.color+'" aria-hidden="true">'+META.victim.init+'</div><div><b>'+esc(META.victim.name)+'</b><span lang="it">'+esc(META.victim.it)+'</span><small lang="en" style="display:block">'+esc(META.victim.en)+'</small></div></div></div>';
+  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who">'+avMeta(META.victim)+'<div><b>'+esc(META.victim.name)+'</b><span lang="it">'+esc(META.victim.it)+'</span><small lang="en" style="display:block">'+esc(META.victim.en)+'</small></div></div></div>';
   h+=META.caso||'';
   h+='<p lang="it">'+mk(META.suspectsLine)+'</p>';
   if(S.unlocked<2){h+=confirmBtn('unlock','2','Siamo pronti: Round 2','We are ready: Round 2')}
@@ -368,7 +435,7 @@ function viewIndizi(){
   h+='<div class="task"><p class="it" lang="it">'+mk(R.task)+'</p><p class="en" lang="en" style="border:0;padding-top:4px">'+esc(R.taskEn)+'</p></div>';
   if(mine.length){
     h+='<h3 lang="it" style="margin-top:4px">I tuoi indizi ('+mine.length+')</h3>';
-    mine.forEach(function(c){h+=cardHtml(c.id,'Indizio '+c.id,c.t,c.it,c.en)});
+    mine.forEach(function(c){h+=cardHtml(c.id,'Indizio '+c.id,c.t,c.it,c.en,clueImg(c.id))});
   }else{
     h+='<div class="card"><p class="it" lang="it">Nessun indizio per te in questo round. Ascolta gli altri e fai domande.</p><p class="en" lang="en">No clue for you in this round. Listen to the others and ask questions.</p></div>';
   }
@@ -384,9 +451,9 @@ function viewIndizi(){
 }
 function viewSospetti(){
   var h='<h2>I sospetti</h2><small>'+esc(META.suspectsSub)+'</small>';
-  h+='<div class="card"><div class="who"><div class="av" style="background:#34495E" aria-hidden="true">'+META.inspector.init+'</div><div><b>'+esc(META.inspector.name)+'</b><span lang="it">'+esc(META.inspector.it.split(' · ')[1]||'')+'</span><small lang="en" style="display:block">'+esc(META.inspector.en)+'</small></div></div></div>';
+  h+='<div class="card"><div class="who">'+avMeta(META.inspector)+'<div><b>'+esc(META.inspector.name)+'</b><span lang="it">'+esc(META.inspector.it.split(' · ')[1]||'')+'</span><small lang="en" style="display:block">'+esc(META.inspector.en)+'</small></div></div></div>';
   CAST.forEach(function(c){
-    h+='<article class="card" data-id="s-'+c.id+'"><div class="who"><div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div><div><b>'+c.name+'</b><span lang="it">'+c.age+' anni · '+c.role+'</span><small lang="en" style="display:block">'+c.age+' · '+esc(c.roleEn)+'</small></div></div>'+
+    h+='<article class="card" data-id="s-'+c.id+'"><div class="who">'+avHtml(c)+'<div><b>'+c.name+'</b><span lang="it">'+c.age+' anni · '+c.role+'</span><small lang="en" style="display:block">'+c.age+' · '+esc(c.roleEn)+'</small></div></div>'+
      '<p class="it" lang="it">'+mk(c.desc)+'</p><div class="gloss" hidden></div><p class="en" lang="en" '+(S.en?'':'hidden')+'>'+esc(c.descEn)+'</p></article>';
   });
   return h;
@@ -603,19 +670,19 @@ function deckSetup(){
 function castCard(i,it){
   var open=S.en||openEn['d-'+i],its='',ens='';
   it.ids.forEach(function(id){var c=castById(id);
-    its+='<div class="who"><div class="av" style="background:'+c.color+'" aria-hidden="true">'+c.name.charAt(0)+'</div><div><b>'+esc(c.name)+'</b><span lang="it">'+c.age+' anni · '+esc(c.role)+'</span></div></div><p class="it" lang="it">'+mk(c.desc)+'</p>';
+    its+='<div class="who">'+avHtml(c)+'<div><b>'+esc(c.name)+'</b><span lang="it">'+c.age+' anni · '+esc(c.role)+'</span></div></div><p class="it" lang="it">'+mk(c.desc)+'</p>';
     ens+='<p lang="en"><b>'+esc(c.name)+'</b>: '+c.age+', '+esc(c.roleEn)+'. '+esc(c.descEn)+'</p>';});
   return '<article class="card" data-id="d-'+i+'"><div class="card-h"><span class="tag">Carta '+(i+1)+' · Personaggi</span>'+SPKBTN+'</div>'+its+'<div class="gloss" hidden></div><button type="button" class="entog" data-act="ent" aria-expanded="'+(open?'true':'false')+'">English</button><div class="en" '+(open?'':'hidden')+'>'+ens+'</div></article>';
 }
 function deckCardHtml(i){
   var it=DECK[i],d=dk(),tag='Carta '+(i+1);
-  if(it.t==='story')return cardHtml('d-'+i,tag+' · La storia','',STORY.it,STORY.en);
+  if(it.t==='story')return cardHtml('d-'+i,tag+' · La storia','',STORY.it,STORY.en,IMGS.scena||'');
   if(it.t==='map')return META.caso||'';
   if(it.t==='cast')return castCard(i,it);
-  if(it.t==='clue'){var c=clueById(it.id);return cardHtml('d-'+i,tag+' · Indizio',c.t,c.it,c.en)}
+  if(it.t==='clue'){var c=clueById(it.id);return cardHtml('d-'+i,tag+' · Indizio',c.t,c.it,c.en,clueImg(c.id))}
   if(it.t==='final')return cardHtml('d-'+i,tag+' · Fine','',it.it,it.en);
   if(it.t==='puzzle'){
-    var h=cardHtml('d-'+i,tag+' · Enigma','',it.it,it.en);
+    var h=cardHtml('d-'+i,tag+' · Enigma','',it.it,it.en,it.img?IMGS[it.img]:'');
     var ex='<div class="row" style="flex-wrap:nowrap"><input class="txt" id="pz'+i+'" type="text" autocomplete="off" placeholder="Risposta / Answer" aria-label="Risposta"><button type="button" class="btn ghost" data-act="pz" data-v="'+i+'" style="flex:none">Controlla</button></div><div id="pzr'+i+'" aria-live="polite">'+(d.puz[i]?'<b>Esatto! / Correct!</b>':'')+'</div>';
     return h.replace(/<\/article>$/,ex+'</article>');
   }
