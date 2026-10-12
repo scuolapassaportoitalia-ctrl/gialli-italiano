@@ -168,6 +168,33 @@ span.av{background:none}
 .who .ico{margin-left:auto}
 .stars{background:var(--tape);color:#15202B;padding:4px 12px;border-radius:4px;display:inline-block;font-size:28px;letter-spacing:6px}
 .pill.cnt{background:var(--tape);color:#15202B;border-color:#15202B;font-size:20px;line-height:1}
+
+.clock{border:2px solid var(--fg);background:var(--surface);border-radius:6px;padding:10px 12px}
+.clock-t{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.clock-t b{font-family:var(--display);font-size:30px;line-height:1}
+.clock-t span{font-size:15px}.clock-t small{width:100%;font-size:13px;color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:4px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--tape)}
+.clock.hot{border-color:#b3261e}.clock.hot .bar i{background:#b3261e}.clock.hot b{color:#b3261e}
+.help{border:2px dashed var(--fg)}
+.hl{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px}
+.hl li{display:flex;gap:12px;align-items:flex-start}
+.hl li>span:last-child{flex:1;display:block}.hl small{display:block;color:var(--muted)}
+.demo{display:inline-block;width:78px;text-align:center;font-weight:700;border:2px solid var(--fg);border-radius:6px;padding:4px 6px;background:var(--surface);flex:none;font-size:14px}
+.demo.w{border:0;border-bottom:2px dotted var(--fg);border-radius:0;background:none}
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.tl li{display:flex;gap:12px;align-items:flex-start;border-left:4px solid var(--tape);padding-left:10px}
+.tl li b{font-family:var(--display);font-size:20px;min-width:54px}
+.tl li>span{flex:1;display:block}.tl small{display:block;color:var(--muted);font-size:13px}
+.tl li.unk{border-left-color:var(--line);color:var(--muted)}
+.entog{font-weight:700;padding:10px 16px;min-height:44px}
+img.av,span.av{width:104px;height:104px;border-radius:10px;object-fit:cover;object-position:50% 20%;border:2px solid var(--fg);flex:none}
+span.av svg{width:100%;height:100%}
+.sus img.av,.sus span.av{width:84px;height:84px}
+.bubble .who img.av,.bubble .who span.av{width:76px;height:76px}
+.sus{min-height:96px}
+.fig.sm{max-width:none;width:100%}
+.fig img,.fig svg{width:100%;height:auto;min-height:220px;object-fit:cover}
 </style>
 
 <div id="app"></div>
@@ -217,106 +244,120 @@ var B=14;
 var CAST=[
  {id:'nicola',name:'Nicola Lorusso',age:41,role:'figlio di Rosa',roleEn:"Rosa's son",desc:'Ha un [ristorante|restaurant] e molti [debiti|debts].',descEn:'He has a restaurant and a lot of debt.',face:{skin:'#e0ac86',hair:'#3b2a20',style:'short',shirt:'#2F6F8F',bg:'#d9e6ee'}},
  {id:'marta',name:'Marta Lorusso',age:36,role:'figlia di Rosa',roleEn:"Rosa's daughter",desc:'Lavora nel forno con la mamma.',descEn:'She works in the bakery with her mother.',face:{skin:'#e8b895',hair:'#5a2f1d',style:'long',shirt:'#8A4F7D',bg:'#efe1ee'}},
- {id:'franco',name:'Franco Mele',age:63,role:'panettiere',roleEn:'baker',desc:'Lavora nel forno da 35 anni.',descEn:'He has worked in the bakery for 35 years.',face:{skin:'#d99f7b',hair:'#b9b9b9',style:'short',stache:true,shirt:'#f2f2f2',bg:'#efe6cf'}},
+ {id:'franco',name:'Franco Mele',age:63,role:'panettiere',roleEn:'baker',desc:'Lavora nel forno da 35 anni. È sposato con Carmela.',descEn:'He has worked in the bakery for 35 years. He is married to Carmela.',face:{skin:'#d99f7b',hair:'#b9b9b9',style:'short',stache:true,shirt:'#f2f2f2',bg:'#efe6cf'}},
  {id:'elena',name:'Elena Greco',age:50,role:'fioraia',roleEn:'florist',desc:'Ha un negozio di fiori vicino al forno.',descEn:'She has a flower shop next to the bakery.',face:{skin:'#e6b490',hair:'#8a3b2a',style:'bun',shirt:'#3F7D4F',bg:'#e3f0e3'}},
  {id:'dario',name:'Dario Fanelli',age:24,role:'fattorino',roleEn:'delivery man',desc:'Trova il corpo di Rosa.',descEn:"He finds Rosa's body.",face:{skin:'#e0ac86',hair:'#222',style:'cap',cap:'#2f5fa8',shirt:'#3D5BA8',bg:'#dfe8f5'}},
- {id:'giulia',name:'Giulia Marino',age:44,role:'compratrice di SuperPuglia',roleEn:'buyer for SuperPuglia',desc:'Lavora per un grande [supermercato|supermarket].',descEn:'She works for a big supermarket.',face:{skin:'#e8b895',hair:'#1f1b18',style:'long',glasses:true,shirt:'#A84B4B',bg:'#f3e0e0'}}
+ {id:'giulia',name:'Giulia Marino',age:44,role:'amica di Rosa',roleEn:"Rosa's friend",desc:'Amica di Rosa dai tempi della scuola. Fa l\'[infermiera|nurse].',descEn:'A friend of Rosa since school. She is a nurse.',face:{skin:'#e8b895',hair:'#1f1b18',style:'long',glasses:true,shirt:'#A84B4B',bg:'#f3e0e0'}}
 ];
-var VICTIM={name:'Rosa Lorusso',it:'68 anni · proprietaria del forno',en:'68 · owner of the bakery',face:{skin:'#e6b490',hair:'#c9c9c9',style:'bun',shirt:'#55616B',bg:'#e5e9ec'}};
+var VICTIM={name:'Rosa Lorusso',it:'68 anni · proprietaria del forno',en:'68 · owner of the bakery',face:{skin:'#e6b490',hair:'#c9c9c9',style:'bun',shirt:'#55616B',bg:'#e5e9ec'},bio:[`Rosa si alzava alle quattro ogni mattina da quarant'anni. Conosceva tutti: i clienti, i vicini, i corrieri. Era generosa con tutti, ma era anche una donna molto riservata: negli ultimi giorni portava un segreto pesante, e non lo aveva detto a nessuno.`,`Rosa got up at four every morning for forty years. She knew everyone: customers, neighbours, couriers. She was generous with everyone, but she was also a very private woman: in the last few days she was carrying a heavy secret, and had told nobody.`]};
 var BRUNO={name:'Ispettrice Bruno',it:'Polizia di Bari',en:'Bari police · she leads the investigation',face:{skin:'#d9a07c',hair:'#2a2a2a',style:'short',shirt:'#34495E',bg:'#d8e0e8'}};
 
 var QS=[
- {k:'alibi',col:'alibi',it:'Dov\'eri domenica mattina tra le 5:00 e le 6:00?',en:'Where were you on Sunday morning between 5:00 and 6:00?'},
- {k:'rosa',col:'motive',it:'Come hai reagito all\'annuncio della vendita?',en:'How did you react to the announcement of the sale?'},
- {k:'key',col:'access',it:'Come si entra nel magazzino del forno?',en:'How does one get into the bakery\'s storeroom?'},
- {k:'know',col:'saw',it:'Hai visto o sentito qualcosa di strano?',en:'Did you see or hear anything strange?'}
+ {k:'alibi',col:'alibi',it:`Dov'eri domenica mattina tra le 5:00 e le 6:00?`,en:'Where were you on Sunday morning between 5:00 and 6:00?'},
+ {k:'rosa',col:'motive',it:`Com'era il tuo rapporto con Rosa, ultimamente?`,en:'How was your relationship with Rosa lately?'},
+ {k:'key',col:'access',it:`Come si entra nel magazzino del forno?`,en:`How does one get into the bakery's storeroom?`},
+ {k:'know',col:'saw',it:`Hai visto o sentito qualcosa di strano?`,en:'Did you see or hear anything strange?'}
 ];
 var ANS={
  nicola:{
-  alibi:['Alle 5:30 ero al [mercato del pesce|fish market] di Molfetta, a quaranta minuti da Bari, e ho la [ricevuta|receipt] che lo dimostra: l\'ho pagata alle 5:31. Come potevo trovarmi in due posti nello stesso momento?','At 5:30 I was at the fish market in Molfetta, forty minutes from Bari. I have the receipt: I paid at 5:31. I could not be in two places at the same time!'],
-  rosa:['Per me la vendita era la soluzione: il mio ristorante è pieno di [debiti|debts] e, con quei soldi, ci saremmo salvati tutti. Quando mia madre ha detto «vendo», per poco non mi sono messo a piangere dalla gioia. Perché avrei dovuto ucciderla proprio adesso?','For me it was the solution: my restaurant is full of debts and the sale would have helped us all. When my mother said "I am selling", I almost cried with joy. Why would I kill her right now?'],
-  key:['Si entra dalla porta dietro, con la chiave. Ma io dal magazzino non passo mai: entro sempre dal [negozio|shop], perché mia madre non sopportava il disordine nel magazzino!','Through the back door, with the key. But I never go in through the storeroom: I always use the shop. My mother hated mess in the storeroom!'],
-  know:['Alle 5:28 ho ricevuto un messaggio di mia madre: «Sto per ricevere una visita, ne parliamo dopo.» Non ho capito chi fosse, e da allora ci ripenso ogni minuto.','I received a message from my mother at 5:28: "I am about to receive a visit, we will talk later." I did not understand who it was. Now I think about that message every minute.']},
+  alibi:[`Alle 5:30 ero al [mercato del pesce|fish market] di Molfetta, a quaranta minuti da Bari, e ho la [ricevuta|receipt] che lo dimostra: l'ho pagata alle 5:31. Come potevo essere qui nello stesso momento?`,`At 5:30 I was at the fish market in Molfetta, forty minutes from Bari, and I have the receipt that proves it: I paid it at 5:31. How could I be here at the same time?`],
+  rosa:[`Mia madre era severa ma giusta. Sabato a cena, però, era strana: parlava poco, guardava Franco e continuava a girare il cucchiaino nel caffè. A un certo punto ha detto soltanto: «Domani le cose cambiano.» Non ho capito che cosa intendesse.`,`My mother was strict but fair. On Saturday at dinner, though, she was strange: she spoke little, looked at Franco and kept stirring the spoon in her coffee. At one point she only said: "Tomorrow things change." I did not understand what she meant.`],
+  key:[`Dalla porta dietro, con la chiave: ce l'abbiamo mia madre, mia sorella, Franco e io. Io però dal magazzino non passo mai, entro sempre dal [negozio|shop]. Franco, invece, quando lavora presto entra quasi sempre da lì.`,`Through the back door, with the key: my mother, my sister, Franco and I have one. I never go through the storeroom, though, I always come in through the shop. Franco, on the other hand, almost always comes in that way when he works early.`],
+  know:[`Alle 5:28 ho ricevuto un messaggio di mia madre: «Sto per ricevere una visita, ne parliamo dopo.» Mi hanno detto che aveva preparato anche il caffè: lo faceva sempre per Franco prima del turno, amaro e senza zucchero, mentre lei lo beve con due cucchiaini di zucchero.`,`At 5:28 I received a message from my mother: "I am about to receive a visit, we will talk later." They told me she had also made coffee: she always made it for Franco before his shift, bitter and without sugar, while she drinks hers with two spoonfuls of sugar.`]},
  marta:{
-  alibi:['Stavo correndo sul [Lungomare|seafront] con un amico, Luca. Abbiamo scattato due foto, una alle 5:15 e l\'altra alle 5:45. Dal Lungomare al forno ci vogliono venti minuti, quindi non c\'è modo che io sia stata qui.','I was running on the seafront with a friend, Luca. We took two photos, at 5:15 and 5:45. From the seafront to the bakery it takes twenty minutes: there is no way.'],
-  rosa:['Ero [furiosa|furious]. Mia madre mi aveva promesso che mi avrebbe lasciato il forno e invece, davanti a tutti, ha annunciato che lo vendeva. È vero, abbiamo litigato. Ma era mia madre, e avevo passato la vita con lei in quel forno.','I was furious. My mother had promised to leave the bakery to me, and instead, in front of everyone, she said she was selling it. We argued, it is true. But she was my mother, and I spent my life with her in that bakery.'],
-  key:['Ho la chiave della porta dietro, come Nicola e Franco. Ma tutti sappiamo che Rosa apriva dall\'interno a chi stava aspettando: una persona di fiducia non aveva bisogno di nessuna chiave.','I have the key to the back door, like Nicola and Franco. But we all know that Rosa opened from the inside for people she was expecting. A trusted person did not need a key.'],
-  know:['Alle 5:28 mia madre mi ha mandato un [vocale|voice message]: «Oggi non venire prima delle otto.» Sembrava tranquilla, per niente spaventata. Ho riascoltato quel vocale centinaia di volte.','At 5:28 my mother sent me a voice message: "Don\'t come before eight today." She was calm. She did not seem scared. I have listened to that message a hundred times.']},
+  alibi:[`Stavo correndo sul [Lungomare|seafront] con un amico, Luca. Abbiamo scattato due foto, una alle 5:15 e l'altra alle 5:45. Dal Lungomare al forno ci vogliono venti minuti, quindi non c'è modo che io sia stata qui.`,`I was running on the seafront with a friend, Luca. We took two photos, one at 5:15 and the other at 5:45. From the seafront to the bakery it takes twenty minutes, so there is no way I was here.`],
+  rosa:[`Venerdì sera mia madre mi ha detto: «Ho saputo una cosa che non avrei mai voluto sapere. Devo essere sicura, prima di parlare.» Non ha voluto dirmi di più, ma aveva gli occhi rossi. Domenica volevo parlarle, e invece mi ha scritto di non venire prima delle otto.`,`On Friday evening my mother told me: "I found out something I never wanted to know. I must be sure before I speak." She did not want to tell me more, but her eyes were red. On Sunday I wanted to talk to her, and instead she wrote to me not to come before eight.`],
+  key:[`Ho la chiave della porta dietro, come Nicola e Franco. Ma la serratura si chiude da fuori: chi ha una chiave può entrare e uscire senza lasciare tracce, e poi richiudere. E la porta, quando è arrivata la polizia, era chiusa.`,`I have the key to the back door, like Nicola and Franco. But the lock closes from outside: whoever has a key can come in and go out without leaving traces, and then lock up again. And the door, when the police arrived, was locked.`],
+  know:[`Alle 5:28 mia madre mi ha mandato un [vocale|voice message]: «Oggi non venire prima delle otto.» Era calma, ma aveva la voce stanca, come dopo una notte in bianco. Ho riascoltato quel vocale centinaia di volte.`,`At 5:28 my mother sent me a voice message: "Don't come before eight today." She was calm, but her voice was tired, as after a sleepless night. I have listened to that message hundreds of times.`]},
  franco:{
-  alibi:['Alle 5:20 ero alla [stazione|station], perché aspettavo il treno di mia moglie in arrivo da Lecce: c\'è una telecamera che mi ha ripreso. In macchina dalla stazione al forno ci vogliono sette minuti, ma io sono rimasto lì fino alle 5:35.','At 5:20 I was at the station: I was waiting for my wife\'s train from Lecce. There is a camera. From the station to the bakery it takes seven minutes by car, but I stayed there until 5:35.'],
-  rosa:['Trentacinque anni di lavoro, e Rosa mi ha detto davanti a tutti: «Da lunedì non mi servi più.» Quella notte non ho dormito. Ero [amareggiato|bitter], ma non sono un assassino: chiedete a mia moglie che uomo sono.','Thirty-five years of work, and Rosa told me, in front of everyone: "From Monday you are no longer needed." I did not sleep. I was bitter, not a murderer. Ask my wife what I am like.'],
-  key:['Ho la chiave della porta dietro da trentacinque anni. Però esiste anche la porta sul [cortile|courtyard]: Rosa la lasciava [socchiusa|ajar] soltanto per le persone di cui si fidava, quelle che stava aspettando.','I have had the key to the back door for thirty-five years. But there is also the door onto the courtyard: Rosa only left it ajar for people she trusted, the ones she was expecting.'],
-  know:['Sul [cortile|courtyard] si affaccia anche il negozio di fiori. Elena e Rosa si incontravano spesso lì, la mattina presto, ma ultimamente non si parlavano più.','The flower shop also looks onto the courtyard. Elena and Rosa often met there, early in the morning, but lately they no longer spoke to each other.']},
+  alibi:[`Alle 5:20 ero alla [stazione|station], perché aspettavo il treno di mia moglie Carmela, in arrivo da Lecce alle 5:55. C'è una telecamera che mi ha ripreso. Dalla stazione al forno ci vogliono sette minuti, ma io sono rimasto lì ad aspettare.`,`At 5:20 I was at the station, because I was waiting for the train of my wife Carmela, arriving from Lecce at 5:55. There is a camera that filmed me. From the station to the bakery it takes seven minutes, but I stayed there waiting.`],
+  rosa:[`Rosa era per me come una sorella: lavoriamo insieme da trentacinque anni. Sabato era un po' fredda con me, ma credevo che fosse soltanto stanca. Perché dovrei averle fatto del male?`,`Rosa was like a sister to me: we have worked together for thirty-five years. On Saturday she was a little cold with me, but I thought she was only tired. Why would I have harmed her?`],
+  key:[`Ho la chiave della porta dietro da trentacinque anni, come Rosa e i suoi figli. Ma questa mattina non l'ho usata: ero alla stazione, e la porta, a quanto dite, era chiusa.`,`I have had the key to the back door for thirty-five years, like Rosa and her children. But this morning I did not use it: I was at the station, and the door, from what you say, was locked.`],
+  know:[`Niente di strano: ero alla stazione e ho aspettato. Il treno è arrivato in ritardo di qualche minuto, ho preso la valigia di Carmela e siamo tornati a casa. Soltanto più tardi ho saputo di Rosa.`,`Nothing strange: I was at the station and I waited. The train arrived a few minutes late, I took Carmela's suitcase and we went home. Only later did I hear about Rosa.`]},
  elena:{
-  alibi:['Dalle 5:00 alle 5:45 sono stata nel mio negozio con Gianni, il [fornitore|supplier] dei fiori: abbiamo preparato le consegne insieme. Lui ha anche firmato un documento alle 5:45.','From 5:00 to 5:45 I was in my shop with Gianni, the flower supplier. We prepared the deliveries together. He also signed a document at 5:45.'],
-  rosa:['Rosa era anche la mia [padrona di casa|landlady]: il mio negozio si trova nel suo edificio. Sabato ha annunciato che avrebbe venduto tutto a SuperPuglia. Il mio negozio esiste da vent\'anni! Ero sconvolta, ma non farei mai del male a nessuno.','Rosa was also my landlady: my shop is in her building. On Saturday she announced she was selling everything to SuperPuglia. My shop has existed for twenty years! I was shocked, but I hurt nobody.'],
-  key:['Dal mio negozio non si può entrare nel forno, ve lo assicuro. Il [cortile|courtyard] è in comune, ma io non lo uso mai e non ho neppure una chiave.','You cannot get into the bakery from my shop, I assure you. The courtyard is shared, but I never use it. I do not even have a key.'],
-  know:['Io non ho visto né sentito niente, perché ero con Gianni! Povera Rosa, [cadere|to fall] dalla scala alla sua età... che disgrazia.','I neither saw nor heard anything: I was with Gianni! Poor Rosa, falling from the ladder at that age... what a misfortune.']},
+  alibi:[`Dalle 5:00 alle 6:00 sono stata nel mio negozio a preparare le composizioni. Ero da sola, ma c'è la telecamera di sicurezza, che registra tutto, anche il cortile. Gianni, il [fornitore|supplier] dei fiori, è arrivato alle 6:00 in punto.`,`From 5:00 to 6:00 I was in my shop preparing the arrangements. I was alone, but there is the security camera, which records everything, even the courtyard. Gianni, the flower supplier, arrived at 6:00 sharp.`],
+  rosa:[`Rosa era la mia [padrona di casa|landlady] e, almeno fino a poco tempo fa, anche una buona amica. Da qualche giorno, però, era fredda con me: sabato non mi ha nemmeno salutata. Non so che cosa avessi fatto di male, e ora non lo saprò mai.`,`Rosa was my landlady and, at least until a short time ago, also a good friend. For a few days, though, she had been cold with me: on Saturday she did not even greet me. I do not know what I had done wrong, and now I never will.`],
+  key:[`Dal mio negozio non si può entrare nel forno, ve lo assicuro. Il [cortile|courtyard] è in comune, ma la porta del magazzino su quel lato si apre soltanto dall'interno. Per entrare da fuori serve la chiave della porta dietro, e io non ce l'ho.`,`You cannot get into the bakery from my shop, I assure you. The courtyard is shared, but the storeroom door on that side only opens from the inside. To get in from outside you need the key to the back door, and I do not have one.`],
+  know:[`Dalla finestra del negozio vedo tutto il cortile, e alle 5:30 non c'era nessuno: la porta del magazzino è rimasta chiusa. Però ho sentito, dalla via dietro il forno, il rumore di una portiera e poi di una chiave nella serratura. Pensavo che fosse Rosa.`,`From the shop window I can see the whole courtyard, and at 5:30 there was nobody: the storeroom door stayed closed. But I heard, from the street behind the bakery, the sound of a car door and then of a key in the lock. I thought it was Rosa.`]},
  dario:{
-  alibi:['Il mio furgone è rimasto al [deposito|depot] fino alle 5:55, e lo conferma il [GPS|GPS]. Il deposito si trova a venti minuti dal forno. Ho consegnato farina e uova, come ogni domenica, e alle 6:30 ho trovato Rosa.','My van stayed at the depot until 5:55, and the GPS confirms it. The depot is twenty minutes from the bakery. I delivered flour and eggs, as every Sunday, and at 6:30 I found Rosa.'],
-  rosa:['Io mi occupo soltanto delle consegne, quindi la vendita non cambia la mia vita. L\'unico problema è il [frigorifero|fridge] rotto: Rosa voleva 500 euro e io non li avevo. Non mi sembra un motivo per uccidere, o sì?','I only do deliveries: the sale does not change my life. The only problem is the broken fridge, 500 euros: Rosa wanted them, but I do not have them. That is not a reason to kill, is it?'],
-  key:['Io entro dalla porta davanti. Ma quando consegno i fiori per Elena, passo dal cortile con il carrello, perché la porta del magazzino è lì. Si può aprire soltanto dall\'interno.','I come in through the front door. But when I deliver flowers for Elena, I go through the courtyard with the trolley: the storeroom door is there. It only opens from the inside.'],
-  know:['Sì: nel [cortile|courtyard], davanti alla porta, c\'era della terra scura e un petalo arancione. Ho pensato: «Strano, Elena è sempre così ordinata.» Poi ho visto Rosa a terra.','Yes: in the courtyard, in front of the door, there was dark soil and an orange petal. I thought: "Strange, Elena is always so tidy." Then I saw Rosa on the floor.']},
+  alibi:[`Il mio furgone è rimasto al [deposito|depot] fino alle 5:55, e lo conferma il [GPS|GPS]. Il deposito si trova a venti minuti dal forno. Ho consegnato farina e uova, come ogni domenica, e alle 6:30 ho trovato Rosa.`,`My van stayed at the depot until 5:55, and the GPS confirms it. The depot is twenty minutes from the bakery. I delivered flour and eggs, as every Sunday, and at 6:30 I found Rosa.`],
+  rosa:[`Rosa mi trattava come un nipote: mi dava sempre un panino caldo. Sabato mi ha fatto una domanda strana: «Dario, tu hai mai visto Franco ed Elena parlare insieme nel cortile?» Le ho risposto di sì, spesso, e lei è diventata pallida.`,`Rosa treated me like a nephew: she always gave me a hot roll. On Saturday she asked me a strange question: "Dario, have you ever seen Franco and Elena talking together in the courtyard?" I answered yes, often, and she turned pale.`],
+  key:[`Io entro dalla porta davanti. La porta dietro si apre con la chiave, e ce l'hanno Rosa, Nicola, Marta e Franco. Quella sul cortile, invece, si apre solo dall'interno: me l'ha spiegato Rosa il primo giorno.`,`I come in through the front door. The back door opens with a key, and Rosa, Nicola, Marta and Franco have one. The one onto the courtyard, on the other hand, only opens from the inside: Rosa explained it to me on the first day.`],
+  know:[`Alle 6:30, quando ho trovato Rosa, sul bancone c'erano due tazzine di caffè: una piena e fredda, l'altra vuota. Mi è sembrato strano, perché Rosa beve il caffè soltanto con lo zucchero, e quella tazzina vuota aveva un fondo scuro, senza neanche un granello.`,`At 6:30, when I found Rosa, there were two coffee cups on the counter: one full and cold, the other empty. It seemed strange to me, because Rosa only drinks coffee with sugar, and that empty cup had a dark residue, without even a grain.`]},
  giulia:{
-  alibi:['Dalle 5:00 alle 6:00 ero in [videochiamata|video call] con New York: esiste la registrazione, e in tutto quel tempo si vede il mio viso. Ero in albergo, a due passi da qui, ma sempre davanti allo schermo.','From 5:00 to 6:00 I was on a video call with New York. The recording exists and you can see my face the whole time. I was in a hotel, a few steps from here, but always in front of the screen.'],
-  rosa:['Per me Rosa era la persona più [preziosa|precious] della città: il contratto non era ancora firmato e soltanto lei poteva firmarlo. Con lei morta, tutto si blocca: ci avrei perso molto più di quanto avrei guadagnato.','For me Rosa was the most precious person in the city: the contract was not yet signed, and only she could sign. With her dead, everything stops. I would lose much more than I would gain.'],
-  key:['Non ho nessuna chiave e non conosco il magazzino. So solo che il forno ha due porte, perché me lo ha spiegato Rosa durante la visita.','I have no key and I do not know the storeroom. I only know that the bakery has two doors, because Rosa told me during the visit.'],
-  know:['Sabato sera, dopo cena, ho visto Rosa parlare a lungo con Elena nel cortile. Elena [gridava|was shouting]: «Vent\'anni! Vent\'anni e mi mandi via così?» Poi è rientrata e ha chiuso la porta.','On Saturday evening, after dinner, I saw Rosa talking for a long time with Elena in the courtyard. Elena was shouting: "Twenty years! Twenty years and you send me away just like that?" Then she went back in and shut the door.']}
+  alibi:[`Quella notte ho fatto il turno all'[ospedale|hospital], dalle 22:00 alle 6:00, e il [cartellino|time card] registra ogni mia uscita. Alle 5:30 stavo assistendo un paziente, insieme a due colleghi.`,`That night I worked the shift at the hospital, from 10:00 p.m. to 6:00 a.m., and the time card records every time I go out. At 5:30 I was assisting a patient, together with two colleagues.`],
+  rosa:[`Rosa era la mia migliore amica da cinquant'anni. Venerdì sera ho dovuto dirle una cosa che le ha spezzato il cuore e che avrei voluto non sapere mai. Lei mi ha ringraziata e mi ha chiesto di non dire niente a nessuno.`,`Rosa was my best friend for fifty years. On Friday evening I had to tell her something that broke her heart and that I wish I had never known. She thanked me and asked me not to tell anyone.`],
+  key:[`Io non ho nessuna chiave e non ho mai avuto bisogno di entrare dal retro: da cinquant'anni entro dal negozio, come una cliente. So soltanto che le chiavi della porta dietro le hanno la famiglia e Franco.`,`I have no key and I have never needed to go in at the back: for fifty years I have come in through the shop, like a customer. I only know that the family and Franco have the keys to the back door.`],
+  know:[`Venerdì sera, tornando a casa, ho visto Franco ed Elena abbracciati nel cortile, vicino alla porta del magazzino. Non era un abbraccio tra amici, su questo non avevo dubbi. L'ho raccontato a Rosa quella stessa notte. Forse non avrei dovuto.`,`On Friday evening, going home, I saw Franco and Elena embracing in the courtyard, near the storeroom door. It was not an embrace between friends, I had no doubt about that. I told Rosa that same night. Perhaps I should not have.`]}
 };
-
+var TIMELINE=[
+ {t:'Ven. sera',a:'giulia.know',it:`Giulia vede Franco ed Elena abbracciati nel cortile e lo racconta a Rosa.`,en:`Giulia sees Franco and Elena embracing in the courtyard and tells Rosa.`},
+ {t:'Sab.',a:'dario.rosa',it:`Rosa chiede a Dario se ha mai visto Franco ed Elena parlare insieme. Lui risponde di sì. Rosa diventa pallida.`,en:`Rosa asks Dario if he has ever seen Franco and Elena talking together. He says yes. Rosa turns pale.`},
+ {t:'Sab. sera',a:'nicola.rosa',it:`A cena Rosa guarda Franco e dice: «Domani le cose cambiano.»`,en:`At dinner Rosa looks at Franco and says: "Tomorrow things change."`},
+ {t:'5:15',a:'marta.alibi',it:`Marta fa una foto sul Lungomare, mentre corre con un amico.`,en:`Marta takes a photo on the seafront, while jogging with a friend.`},
+ {t:'5:20',a:'franco.alibi',it:`La telecamera della stazione riprende Franco, che aspetta il treno di Carmela.`,en:`The station camera films Franco, waiting for Carmela's train.`},
+ {t:'5:28',at:0,it:`Rosa scrive due messaggi: «Sto per ricevere una visita.» Poi nessuno la sente più.`,en:`Rosa writes two messages: "I am about to receive a visit." Then nobody hears from her again.`},
+ {t:'5:30',a:'elena.know',it:`Elena sente una portiera e una chiave nella serratura, dietro il forno.`,en:`Elena hears a car door and a key in the lock, behind the bakery.`},
+ {t:'5:31',a:'nicola.alibi',it:`Nicola paga il pesce al mercato di Molfetta (ricevuta).`,en:`Nicola pays for fish at the Molfetta market (receipt).`},
+ {t:'5:45',at:0,it:`Il medico: Rosa è stata colpita tra le 5:28 e le 5:45.`,en:`The doctor: Rosa was struck between 5:28 and 5:45.`},
+ {t:'5:52',at:9,it:`La telecamera riprende di nuovo Franco alla stazione.`,en:`The camera films Franco at the station again.`},
+ {t:'5:55',a:'dario.alibi',it:`Il furgone di Dario lascia il deposito. Il treno di Carmela arriva.`,en:`Dario's van leaves the depot. Carmela's train arrives.`},
+ {t:'6:30',a:'dario.know',it:`Dario trova Rosa. Sul bancone ci sono due tazzine di caffè.`,en:`Dario finds Rosa. On the counter there are two coffee cups.`}
+];
 var STORY={
  it:[
-  'Domenica, ore 6:30. A [Bari Vecchia|the old town of Bari] il [forno|bakery] Lorusso è ancora chiuso. Il [fattorino|delivery man] Dario entra dal retro e trova Rosa Lorusso, la panettiera più amata del quartiere, ai piedi della [scala|ladder] del magazzino. È morta.',
-  'Sembra un [incidente|accident]: una donna di sessantotto anni, una scala, una caduta. Ma l\'ispettrice Bruno non è convinta. «Rosa saliva su quella scala da quarant\'anni», dice. «E sabato sera ha annunciato a tutta la famiglia che avrebbe venduto l\'edificio a un grande [supermercato|supermarket].»',
-  'Il medico conferma i sospetti: Rosa non è morta a causa della caduta. Qualcuno l\'ha colpita alla testa e poi ha [sistemato|arranged] il corpo in modo da far pensare a un incidente.',
-  'Sei persone avevano un buon motivo e quasi tutte raccontano una storia credibile. Ma una di loro [mente|lies]. Voi siete gli assistenti dell\'ispettrice: [interrogate|question] i sospettati, confrontate i racconti con i fatti e trovate la contraddizione. Avete soltanto 14 domande, quindi sceglietele con cura.'
+  `Domenica, ore 4:30. A [Bari Vecchia|the old town of Bari] le strade sono ancora vuote. Nel forno Lorusso la luce è accesa, come ogni mattina: Rosa Lorusso, sessantotto anni, sta preparando il pane per tutto il quartiere. Questa mattina, però, è diversa: da sabato sera Rosa non è più la stessa.`,
+  `Alle 6:30 il [fattorino|delivery man] Dario entra dal retro e trova Rosa ai piedi della [scala|ladder] del magazzino. È morta. Sembra un [incidente|accident]: una donna anziana, una scala, una caduta. Ma l'ispettrice Bruno non è convinta. «Rosa saliva su quella scala da quarant'anni», dice. «E sabato sera, a cena, era pallida e silenziosa: aveva scoperto qualcosa che l'aveva ferita nel profondo.»`,
+  `Il medico conferma i sospetti: Rosa non è morta a causa della caduta. Qualcuno l'ha colpita alla testa e poi ha [sistemato|arranged] il corpo in modo da far pensare a un incidente. Non è stato un furto: nel forno non manca niente, a parte una teglia di ghisa.`,
+  `Sono le 6:40. Il quartiere si sveglia e alle 9:00 il forno deve riaprire: dopo quell'ora il caso passa al procuratore. Sei persone avevano un legame stretto con Rosa e quasi tutte raccontano una storia credibile. Ma una di loro [mente|lies]. Voi siete gli assistenti dell'ispettrice: [interrogate|question] i sospettati, leggete i rapporti e trovate la contraddizione. Ogni domanda costa nove minuti: ne avete soltanto 14.`
  ],
  en:[
-  'Sunday, 6:30. In the old town of Bari, the Lorusso bakery is still closed. The delivery man Dario comes in through the back and finds Rosa Lorusso, the most beloved baker in the neighbourhood, at the foot of the storeroom ladder. She is dead.',
-  'It looks like an accident: a sixty-eight-year-old woman, a ladder, a fall. But Inspector Bruno is not convinced. "Rosa had been climbing that ladder for forty years," she says. "And on Saturday evening she announced to the whole family that she is selling the building to a big supermarket."',
-  'The doctor confirms the suspicion: Rosa did not die from the fall. Someone hit her on the head, then arranged the body to make it look like an accident.',
-  'Six people had a good reason, and almost all of them tell a believable story. But one of them is lying. You are the inspector\'s assistants: question the suspects, compare their stories with the facts, and find the contradiction. You only have 14 questions: choose them carefully.'
+  `Sunday, 4:30 a.m. In the old town of Bari the streets are still empty. In the Lorusso bakery the light is on, as every morning: Rosa Lorusso, sixty-eight, is preparing bread for the whole neighbourhood. This morning, though, is different: since Saturday evening Rosa has not been herself.`,
+  `At 6:30 the delivery man Dario comes in through the back and finds Rosa at the foot of the storeroom ladder. She is dead. It looks like an accident: an elderly woman, a ladder, a fall. But Inspector Bruno is not convinced. "Rosa had been climbing that ladder for forty years," she says. "And on Saturday evening, at dinner, she was pale and silent: she had found out something that had hurt her deeply."`,
+  `The doctor confirms the suspicion: Rosa did not die from the fall. Someone hit her on the head, then arranged the body to make it look like an accident. It was not a theft: nothing is missing from the bakery, apart from a cast-iron tray.`,
+  `It is 6:40. The neighbourhood is waking up and at 9:00 the bakery must reopen: after that the case goes to the prosecutor. Six people had a close bond with Rosa and almost all of them tell a believable story. But one of them is lying. You are the inspector's assistants: question the suspects, read the reports and find the contradiction. Every question costs nine minutes: you only have 14.`
  ]
 };
 var REPORTS=[
- {at:0,t:'Il ritrovamento',it:'Dario trova Rosa alle 6:30, ai piedi della [scala|ladder] del magazzino, e chiama la polizia alle 6:32. Sembra una caduta, ma alle 7:15 il medico dichiara: «Rosa è stata colpita alla testa con un oggetto pesante e piatto, tra le 5:28 e le 5:45. Poi qualcuno ha spostato il corpo sotto la scala.»',en:'Dario finds Rosa at 6:30, at the foot of the storeroom ladder, and calls the police at 6:32. It looks like a fall. But the doctor, at 7:15, says: "Rosa was hit on the head with a heavy, flat object between 5:28 and 5:45. Then someone moved the body under the ladder."',img:'piano'},
- {at:0,t:'Il telefono di Rosa',it:'Alle 5:28 Rosa ha mandato due messaggi: un [vocale|voice message] a Marta («Oggi non venire prima delle otto») e un testo a Nicola («Sto per ricevere una visita, ne parliamo dopo»). Dunque, alle 5:28 Rosa era ancora viva e stava aspettando qualcuno.',en:'At 5:28 Rosa sent two messages: a voice message to Marta ("Don\'t come before eight today") and a text to Nicola ("I am about to receive a visit, we will talk later"). At 5:28 Rosa was alive and was expecting someone.',img:'timer'},
- {at:3,t:'Le due porte',it:'Il magazzino ha due porte. Quella dietro, sulla strada, si apre con la chiave: ce l\'hanno Rosa, Nicola, Marta e Franco. Quella sul [cortile|courtyard], invece, non ha la chiave e si apre soltanto dall\'interno. Il cortile è in comune con il negozio di fiori. La porta del retro era chiusa a chiave: nessuno è entrato da lì.',en:'The storeroom has two doors. The back one, on the street, opens with a key: Rosa, Nicola, Marta and Franco have one. The one onto the courtyard has no key: it opens only from the inside. The courtyard is shared with the flower shop. The back door is locked: nobody came in that way.',img:'doors'},
- {at:6,t:'Le tracce nel cortile',it:'Davanti alla porta del cortile la polizia trova della [terra|soil] scura e un [petalo|petal] arancione di gerbera. Sul pavimento del magazzino, vicino al corpo, c\'è lo stesso tipo di terra. Il [vaso|pot] con cui hanno colpito Rosa, invece, non è stato ancora trovato.',en:'In front of the courtyard door the police find dark soil and an orange gerbera petal. On the storeroom floor there is the same kind of soil, near the body. The pot that hit Rosa has not been found.',img:'flowers'},
- {at:9,t:'Le dichiarazioni di Gianni',it:'La polizia ascolta Gianni, il fornitore di fiori: «Sono arrivato al negozio di Elena alle 5:30. La porta era aperta, ma Elena non c\'era, quindi ho aspettato. È tornata dieci minuti dopo. Ho firmato il documento alle 5:45.»',en:'The police question Gianni, the flower supplier: "I arrived at Elena\'s shop at 5:30. The door was open, but Elena was not there. I waited. She came back ten minutes later. I signed the document at 5:45."',img:'receipt'},
- {at:12,t:'Messaggio di Bruno',it:'Siamo quasi alla fine. Provate a pensare: chi poteva trovarsi da solo tra le 5:28 e le 5:45? Chi poteva entrare senza una chiave? Chi perdeva qualcosa con la vendita? E soprattutto: chi racconta una storia che non coincide con i fatti?',en:'We are almost at the end. Think: who could have been alone between 5:28 and 5:45? Who could get in without a key? Who lost something with the sale? And above all: who tells a story that does not match the facts?'}
+ {at:0,t:'Il ritrovamento',it:`Dario trova Rosa alle 6:30, ai piedi della [scala|ladder] del magazzino, e chiama la polizia alle 6:32. Sembra una caduta, ma alle 7:15 il medico dichiara: «Rosa è stata colpita alla testa con un oggetto pesante e piatto, tra le 5:28 e le 5:45. Poi qualcuno ha spostato il corpo sotto la scala.»`,en:`Dario finds Rosa at 6:30, at the foot of the storeroom ladder, and calls the police at 6:32. It looks like a fall, but at 7:15 the doctor declares: "Rosa was hit on the head with a heavy, flat object between 5:28 and 5:45. Then someone moved the body under the ladder."`,img:'piano'},
+ {at:0,t:'Il telefono di Rosa',it:`Alle 5:28 Rosa ha mandato due messaggi: un [vocale|voice message] a Marta («Oggi non venire prima delle otto») e un testo a Nicola («Sto per ricevere una visita, ne parliamo dopo»). Dunque, alle 5:28 Rosa era ancora viva e stava aspettando una persona che conosceva bene.`,en:`At 5:28 Rosa sent two messages: a voice message to Marta ("Don't come before eight today") and a text to Nicola ("I am about to receive a visit, we will talk later"). So at 5:28 Rosa was still alive and was waiting for someone she knew well.`},
+ {at:3,t:'Le due porte',it:`Il magazzino ha due porte. Quella dietro, sulla strada, si apre con la chiave: ce l'hanno Rosa, Nicola, Marta e Franco, e la serratura si chiude da fuori. Quella sul [cortile|courtyard], invece, non ha la chiave e si apre soltanto dall'interno. Quando è arrivata la polizia, la porta dietro era chiusa a chiave.`,en:`The storeroom has two doors. The back one, on the street, opens with a key: Rosa, Nicola, Marta and Franco have one, and the lock closes from outside. The one onto the courtyard, on the other hand, has no key and opens only from the inside. When the police arrived, the back door was locked.`,img:'doors'},
+ {at:4,twist:true,t:'Nicola in questura',it:`La polizia scopre che Nicola ha quarantamila euro di debiti con un [usuraio|loan shark] e che sabato Rosa gli aveva detto di no a un nuovo prestito. Nicola viene portato in questura. «Abbiamo litigato, è vero, ma io non l'ho uccisa!» Nel quartiere tutti pensano che sia lui il colpevole: ha un movente, e Rosa gli ha scritto alle 5:28.`,en:`The police discover that Nicola has forty thousand euros of debt with a loan shark and that on Saturday Rosa had said no to a new loan. Nicola is taken to the police station. "We argued, it is true, but I did not kill her!" In the neighbourhood everyone thinks he is the culprit: he has a motive, and Rosa wrote to him at 5:28.`},
+ {at:6,t:'Le prove digitali',it:`La telecamera del negozio di fiori mostra Elena al lavoro dalle 5:00 alle 6:00, e inquadra anche il cortile: nessuno è passato. Il [GPS|GPS] del furgone di Dario lo colloca al deposito fino alle 5:55. Il cartellino dell'ospedale conferma che Giulia era di turno. La ricevuta di Molfetta è delle 5:31 e le foto di Marta sono delle 5:15 e delle 5:45.`,en:`The flower shop camera shows Elena at work from 5:00 to 6:00, and it also films the courtyard: nobody went through. The GPS of Dario's van places him at the depot until 5:55. The hospital time card confirms that Giulia was on shift. The Molfetta receipt is from 5:31 and Marta's photos are from 5:15 and 5:45.`},
+ {at:8,twist:true,t:'Il caffè amaro',it:`Colpo di scena! Il laboratorio analizza le due tazzine sul bancone. Quella piena e fredda è di Rosa: caffè con due cucchiaini di zucchero. Quella vuota non ha zucchero: Rosa aspettava una persona che beve il caffè [amaro|bitter], una persona di casa, con la chiave e con molta confidenza. Nicola viene [rilasciato|released]: la ricevuta di Molfetta lo scagiona. Il colpevole è ancora libero, e conosceva bene le abitudini di Rosa.`,en:`Plot twist! The laboratory analyses the two cups on the counter. The full, cold one is Rosa's: coffee with two spoonfuls of sugar. The empty one has no sugar: Rosa was waiting for a person who drinks bitter coffee, someone from the house, with a key and a lot of familiarity. Nicola is released: the Molfetta receipt clears him. The culprit is still free, and knew Rosa's habits well.`},
+ {at:9,t:'La stazione',it:`La polizia controlla la telecamera della stazione di Bari. Franco appare alle 5:20, mentre guarda il tabellone, e di nuovo alle 5:52, mentre aspetta sul binario. Il treno da Lecce è arrivato alle 5:55. Tra le 5:20 e le 5:52 la telecamera non lo inquadra: sono trentadue minuti.`,en:`The police check the Bari station camera. Franco appears at 5:20, looking at the board, and again at 5:52, waiting on the platform. The train from Lecce arrived at 5:55. Between 5:20 and 5:52 the camera does not show him: that is thirty-two minutes.`},
+ {at:12,t:'Messaggio di Bruno',it:`Siamo quasi alla fine. Dalla stazione al forno ci vogliono sette minuti in macchina. Pensate: quanto tempo serve per andare, parlare, colpire e tornare? Chi ha una chiave, un legame personale con Rosa e un buco nel suo alibi?`,en:`We are almost at the end. From the station to the bakery it takes seven minutes by car. Think: how long does it take to go, talk, strike and come back? Who has a key, a personal bond with Rosa and a gap in their alibi?`}
 ];
-var HINT={it:'Aiuto di Bruno: non fidatevi della persona che non ha un alibi, sarebbe troppo ovvio. Confrontate piuttosto il racconto di ciascuno con gli orari: alle 5:28 Rosa è viva, alle 5:45 è morta. Chi non riesce a dimostrare dove si trovava in quei diciassette minuti?',en:'Help from Bruno: do not trust the person without an alibi, it is too obvious. Instead compare everyone\'s story with the times: 5:28 (Rosa is alive) and 5:45 (Rosa is dead). Who cannot prove where they were in those seventeen minutes?'};
+var HINT={it:`Aiuto di Bruno: non cercate il movente nei soldi, ma nei sentimenti. Poi confrontate gli alibi con i minuti tra le 5:28 e le 5:45: chi ha una prova che copre tutto il tempo e chi, invece, ha un buco che non sa spiegare?`,en:`Help from Bruno: do not look for the motive in money, but in feelings. Then compare the alibis with the minutes between 5:28 and 5:45: who has proof that covers the whole time and who, on the other hand, has a gap they cannot explain?`};
 var COLS=[{k:'motive',it:'Motivo',en:'Motive'},{k:'access',it:'Accesso',en:'Access'},{k:'alibi',it:'Alibi',en:'Alibi'},{k:'saw',it:'Testimone',en:'Witness'}];
 var PROOFS=[
- {k:'alibi',it:'Dice di essere stata con Gianni dalle 5:00, ma Gianni è arrivato alle 5:30.',en:'Says she was with Gianni from 5:00, but Gianni arrives at 5:30.',ok:true},
- {k:'access',it:'Può raggiungere la porta del cortile in pochi secondi.',en:'Can reach the courtyard door in a few seconds.',ok:true},
- {k:'motive',it:'Con la vendita dell\'edificio perde il suo negozio.',en:'With the sale of the building she loses her shop.',ok:true},
- {k:'key',it:'Ha la chiave della porta dietro.',en:'Has the key to the back door.',ok:false},
- {k:'debts',it:'Ha un ristorante e molti debiti.',en:'Has a restaurant and a lot of debt.',ok:false},
- {k:'argue',it:'Ha litigato con Rosa sabato sera.',en:'Argued with Rosa on Saturday evening.',ok:false}
+ {k:'alibi',it:`La telecamera lo mostra alla stazione alle 5:20 e alle 5:52, ma non nel mezzo.`,en:`The camera shows him at the station at 5:20 and 5:52, but not in between.`,ok:true},
+ {k:'access',it:`Ha la chiave della porta dietro e può richiuderla da fuori.`,en:`Has the key to the back door and can lock it again from outside.`,ok:true},
+ {k:'motive',it:`Rosa aveva scoperto il suo tradimento.`,en:`Rosa had found out about his betrayal.`,ok:true},
+ {k:'debts',it:`Ha un ristorante e molti debiti.`,en:`Has a restaurant and a lot of debt.`,ok:false},
+ {k:'argue',it:`Ha litigato con Rosa in passato.`,en:`Argued with Rosa in the past.`,ok:false},
+ {k:'body',it:`Ha trovato il corpo di Rosa.`,en:`Found Rosa's body.`,ok:false}
 ];
 var SOL={
  it:[
-  'L\'ispettrice Bruno riunisce tutti nel forno e dice: «Abbiamo cercato la persona senza alibi. Ma l\'assassino non era il più ovvio: era chi aveva l\'alibi più [elegante|elegant].»',
-  'Sabato sera Rosa annuncia che venderà l\'edificio a SuperPuglia. Per Elena è una [catastrofe|catastrophe]: dopo vent\'anni perde il suo negozio. Nel cortile litiga con Rosa e grida: «Vent\'anni e mi mandi via così?» Giulia la sente.',
-  'Domenica, alle 5:28, Rosa scrive a Marta e a Nicola che sta per ricevere una visita: poiché la porta del cortile si apre soltanto dall\'interno, Rosa deve aver aperto a una persona di fiducia. Elena attraversa il cortile e Rosa le apre. Elena la colpisce con un [vaso|pot] pesante e poi sposta il corpo sotto la scala per simulare un incidente.',
-  'Gli altri hanno un alibi solido: Nicola (la ricevuta di Molfetta delle 5:31), Marta (le foto sul Lungomare delle 5:15 e delle 5:45), Franco (la telecamera della stazione fino alle 5:35), Dario (il GPS) e Giulia (una videochiamata registrata; inoltre, con Rosa morta, avrebbe perso il contratto).',
-  'Elena sostiene di essere stata nel negozio con Gianni dalle 5:00. Ma Gianni dice di essere arrivato alle 5:30 e di non averla trovata: è tornata dieci minuti dopo. Quei dieci minuti coincidono con la morte di Rosa. Inoltre, la terra scura e il petalo arancione davanti alla porta del cortile provengono dal suo negozio.',
-  'Elena si siede e dice piano: «Non volevo ucciderla. Volevo soltanto parlarle un\'ultima volta. Poi mi ha detto che la decisione era presa... e ho perso il controllo.»'
+  `L'ispettrice Bruno riunisce tutti nel forno e dice: «Questo non è un delitto per soldi, ma per amore e per vergogna. L'assassino non aveva un alibi falso: aveva un alibi con un buco.»`,
+  `Per trent'anni Rosa e Franco hanno avuto una relazione segreta, mentre lui restava sposato con Carmela. Venerdì sera Giulia vede Franco abbracciare Elena nel cortile e lo racconta a Rosa. Rosa soffre, ma vuole essere sicura: il sabato chiede a Dario se ha mai visto i due parlare insieme e, a cena, osserva Franco in silenzio.`,
+  `Domenica, alle 5:28, Rosa scrive a Marta e a Nicola che sta per ricevere una visita e prepara due caffè: uno dolce per sé e uno amaro per Franco. Franco lascia la stazione alle 5:21 e raggiunge il forno in sette minuti. Entra dalla porta dietro con la sua chiave e Rosa gli dice che ha scoperto tutto e che racconterà ogni cosa a Carmela.`,
+  `Nella discussione Franco perde il controllo: colpisce Rosa con una pesante [teglia|baking tray] di ghisa e poi sposta il corpo sotto la scala per far pensare a un incidente. Beve il caffè amaro, richiude la porta a chiave e torna in macchina: alle 5:52 è di nuovo in stazione, ad aspettare il treno di sua moglie.`,
+  `Gli altri hanno alibi solidi: Nicola (la ricevuta di Molfetta delle 5:31), Marta (le foto sul Lungomare delle 5:15 e delle 5:45), Elena (la telecamera del negozio), Dario (il GPS) e Giulia (il cartellino dell'ospedale). Franco, invece, appare alla stazione alle 5:20 e alle 5:52: in mezzo ci sono trentadue minuti e il forno è a sette minuti di macchina. Bastavano. Inoltre, la tazzina vuota senza zucchero era la sua.`,
+  `Franco si siede e dice piano: «Voleva dire tutto a Carmela. Trentacinque anni... e in un attimo ho perso la testa.»`
  ],
  en:[
-  'Inspector Bruno gathers everyone in the bakery. She says: "We looked for the person with no alibi. But the murderer was not the most obvious person: it was the one with the most elegant alibi."',
-  'On Saturday evening Rosa announces that she is selling the building to SuperPuglia. For Elena it is a catastrophe: she loses her shop after twenty years. In the courtyard she argues with Rosa and shouts: "Twenty years and you send me away just like that?" Giulia hears her.',
-  'On Sunday, at 5:28, Rosa writes to Marta and Nicola that she is about to receive a visitor: the courtyard door only opens from the inside, so Rosa opens to a person she trusts. Elena crosses the courtyard and Rosa lets her in. Elena hits her with a heavy pot, then moves the body under the ladder to simulate an accident.',
-  'The others have a solid alibi: Nicola (receipt from Molfetta at 5:31), Marta (photos on the seafront at 5:15 and 5:45), Franco (station camera until 5:35), Dario (GPS) and Giulia (recorded video call, and anyway with Rosa dead she lost the contract).',
-  'Elena claims she was in the shop with Gianni from 5:00. But Gianni says he arrived at 5:30 and that Elena was not there: she came back ten minutes later. Those ten minutes coincide with Rosa\'s death. On top of that, the dark soil and the orange petal in front of the courtyard door come from her shop.',
-  'Elena sits down. She says quietly: "I did not want to kill her. I only wanted to talk to her one last time. Then she said the decision was made... and I lost control."'
+  `Inspector Bruno gathers everyone in the bakery and says: "This is not a crime for money, but for love and shame. The murderer did not have a false alibi: he had an alibi with a gap."`,
+  `For thirty years Rosa and Franco had a secret relationship, while he stayed married to Carmela. On Friday evening Giulia sees Franco embracing Elena in the courtyard and tells Rosa. Rosa suffers, but she wants to be sure: on Saturday she asks Dario if he has ever seen the two talking together and, at dinner, she watches Franco in silence.`,
+  `On Sunday, at 5:28, Rosa writes to Marta and Nicola that she is about to receive a visit and makes two coffees: a sweet one for herself and a bitter one for Franco. Franco leaves the station at 5:21 and reaches the bakery in seven minutes. He comes in through the back door with his key and Rosa tells him she has found out everything and that she will tell Carmela all.`,
+  `In the argument Franco loses control: he hits Rosa with a heavy cast-iron tray and then moves the body under the ladder to suggest an accident. He drinks the bitter coffee, locks the door again and gets back in the car: at 5:52 he is at the station again, waiting for his wife's train.`,
+  `The others have solid alibis: Nicola (the Molfetta receipt of 5:31), Marta (the seafront photos of 5:15 and 5:45), Elena (the shop camera), Dario (the GPS) and Giulia (the hospital time card). Franco, instead, appears at the station at 5:20 and 5:52: in between there are thirty-two minutes and the bakery is seven minutes away by car. They were enough. Besides, the empty cup without sugar was his.`,
+  `Franco sits down and says quietly: "She wanted to tell Carmela everything. Thirty-five years... and in a moment I lost my head."`
  ]
 };
-var CULPRIT='elena';
-var TEACHER="Elena Greco. Rosa era viva alle 5:28 (messaggi) ed è morta entro le 5:45. Elena dice di essere con Gianni dalle 5:00, ma Gianni arriva alle 5:30 e lei torna dopo 10 minuti: nessun alibi tra le 5:30 e le 5:40. Può entrare dalla porta del cortile (si apre solo dall'interno: Rosa apre a chi aspetta). Perde il negozio con la vendita; terra e petalo di gerbera davanti alla porta. Alibi degli altri: Nicola (Molfetta 5:31), Marta (foto 5:15 e 5:45), Franco (telecamera della stazione fino alle 5:35), Dario (GPS fino alle 5:55), Giulia (videochiamata registrata).";
-
+var CULPRIT='franco';
+var TEACHER=`Franco Mele. Movente passionale: Rosa e Franco erano amanti da decenni; Giulia vede Franco ed Elena abbracciati e lo dice a Rosa, che vuole affrontarlo e dirlo alla moglie Carmela. Rosa è viva alle 5:28 e aspetta una visita (due caffè: uno dolce, uno amaro: il caffè amaro è di Franco). Franco ha un buco nell'alibi: telecamera della stazione alle 5:20 e 5:52, stazione-forno 7 minuti. Ha la chiave della porta dietro (si richiude da fuori). Alibi degli altri: Nicola (Molfetta 5:31), Marta (foto 5:15 e 5:45), Elena (telecamera negozio), Dario (GPS), Giulia (turno in ospedale).`;
 function fpic(k,alt){return '<img src="'+FIMG[k]+'" alt="'+alt+'" loading="lazy">'}
 CAST.forEach(function(c){if(FIMG[c.id])c.face.img=FIMG[c.id]});
 VICTIM.face.img=FIMG.rosa;BRUNO.face.img=FIMG.bruno;
@@ -324,38 +365,42 @@ IMGS.scena=fig(fpic('scena','Il forno Lorusso'),'Il forno Lorusso, a Bari Vecchi
 IMGS.piano=fig(fpic('furgone','Il furgone di Dario alle prime luci'),'Il furgone di Dario, domenica mattina','Dario\'s van, Sunday morning','sm');
 IMGS.doors=fig(fpic('chiavi','Le chiavi e la porta'),'Le chiavi e la porta del magazzino','The keys and the storeroom door','sm');
 
-var GAME={key:'delitto-al-forno-v3',title:'Delitto al Forno',sub:'Aiuta l\'ispettrice Bruno · A2–B1',
+
+var GAME={key:'delitto-al-forno-v4',title:'Delitto al Forno',sub:'Aiuta l\'ispettrice Bruno · A2–B1',
  q:['Chi ha ucciso Rosa?','Who killed Rosa?'],
  intro:['Un giallo a Bari Vecchia. Interrogate i sospettati e aiutate l\'ispettrice Bruno.','A mystery in the old town of Bari. Question the suspects and help Inspector Bruno.'],
  rule1:['Voi siete gli assistenti dell\'ispettrice Bruno.','You are Inspector Bruno\'s assistants.'],
  reportsH:'Rapporti dell\'ispettrice Bruno',fromIt:'dell\'ispettrice Bruno',fromEn:'from Inspector Bruno',
- helpTag:'Aiuto di Bruno',helpBtn:['Chiedi un aiuto a Bruno','Ask Bruno for help · costs 2 questions']};
-var EPI={title:'La clausola nascosta',teaser:['Il caso è chiuso. Ma nel contratto con SuperPuglia c\'è una pagina che nessuno ha ancora letto.','The case is closed. But in the SuperPuglia contract there is a page nobody has read yet.'],
+ t0:6*60+40,dt:9,dl:['Alle 9:00 il forno deve riaprire e il caso passa al procuratore: dopo, il colpevole è libero.','At 9:00 the bakery must reopen and the case goes to the prosecutor: after that, the culprit is free.'],helpTag:'Aiuto di Bruno',helpBtn:['Chiedi un aiuto a Bruno','Ask Bruno for help · costs 2 questions']};
+var EPI={title:'Il quaderno nero',teaser:['Il caso è chiuso. Ma nel cassetto del forno c\'è un quaderno che nessuno ha ancora aperto.','The case is closed. But in the bakery drawer there is a notebook that nobody has opened yet.'],
  it:[
-  `Elena viene portata in questura. Nel forno resta un silenzio pesante: Franco si siede sullo sgabello, Marta piange in silenzio e Nicola abbraccia la sorella. Per un lungo minuto nessuno dice niente.`,
-  `Poi l'ispettrice Bruno apre una cartella: «Ho letto con attenzione il contratto con SuperPuglia. In fondo c'è una clausola scritta a mano da Rosa, che Giulia aveva già accettato per [email|email].» La clausola stabilisce che il negozio di fiori di Elena resterà al suo posto, con l'[affitto|rent] invariato, per vent'anni.`,
-  `Ecco il segreto: alle 5:28 Rosa stava aspettando Elena nel magazzino proprio per darle quella notizia. Aveva passato la notte a [trattare|negotiate] con Giulia per salvarle il negozio, e aprì la porta del cortile sorridendo. Elena non lo ha mai saputo, perché non le ha lasciato il tempo di parlare.`,
-  `Qualche mese dopo il forno riapre: Marta e Franco lo gestiscono insieme, con il nome «Forno Rosa». Nicola vende il ristorante e paga i debiti. Ogni mattina, davanti alla porta del cortile, c'è un vaso di gerbere arancioni: le manda Elena dal carcere, tramite Dario, e nessuno le toglie mai.`
+  `Franco viene portato in questura. Nel forno resta un silenzio pesante: Marta piange, Nicola si siede sullo sgabello e Carmela, la moglie di Franco, appena scesa dal treno da Lecce, resta ferma sulla porta senza capire che cosa sia successo.`,
+  `Poi l'ispettrice Bruno apre il cassetto sotto il bancone e tira fuori un quaderno nero. Sono trentacinque anni di appunti di Rosa: date, [ricette|recipes] e piccole frasi d'amore per Franco. Rosa e Franco erano innamorati in segreto fin dal 1990, quando lui era già sposato.`,
+  `Ecco il segreto: l'ultima pagina è datata sabato notte. Rosa scrive: «Domani gli dico di scegliere: Elena o Carmela. Se sceglie Elena, lo lascio andare e resto sola. Non voglio vendetta, voglio soltanto la verità.» Non voleva rovinarlo: voleva guardarlo negli occhi.`,
+  `Qualche mese dopo il forno riapre con il nome «Forno Rosa»: Marta e Nicola lo gestiscono insieme. Ogni mattina, alle 5:30, una signora anziana compra un filone ancora caldo e lo paga con una moneta da due euro: è Carmela. Non dice mai niente, ma lascia sempre un piccolo fiore di campo sul bancone.`
  ],
  en:[
-  `Elena is taken to the police station. A heavy silence stays in the bakery. Franco sits down on the stool, Marta cries quietly, Nicola hugs his sister. For a long minute nobody says anything.`,
-  `Then Inspector Bruno opens a folder: "I read the contract with SuperPuglia carefully. At the end there is a clause handwritten by Rosa, which Giulia had already accepted by email." The clause says: Elena's flower shop stays where it is, with the rent unchanged, for twenty years.`,
-  `Here is the secret: at 5:28 Rosa was expecting Elena in the storeroom precisely to give her that news. She had spent the night negotiating with Giulia to save her shop, and she opened the courtyard door smiling. Elena never knew, because she did not let her speak.`,
-  `A few months later the bakery reopens: Marta and Franco run it together, under the name "Forno Rosa". Nicola sells the restaurant and pays off his debts. Every morning, in front of the courtyard door, there is a pot of orange gerberas: Elena sends them from prison, through Dario. Nobody ever removes them.`
+  `Franco is taken to the police station. A heavy silence stays in the bakery: Marta cries, Nicola sits down on the stool and Carmela, Franco's wife, who has just got off the train from Lecce, stands still at the door without understanding what has happened.`,
+  `Then Inspector Bruno opens the drawer under the counter and pulls out a black notebook. It is thirty-five years of Rosa's notes: dates, recipes and little love phrases for Franco. Rosa and Franco had been secretly in love since 1990, when he was already married.`,
+  `Here is the secret: the last page is dated Saturday night. Rosa writes: "Tomorrow I will tell him to choose: Elena or Carmela. If he chooses Elena, I will let him go and stay alone. I do not want revenge, I only want the truth." She did not want to ruin him: she wanted to look him in the eye.`,
+  `A few months later the bakery reopens under the name "Forno Rosa": Marta and Nicola run it together. Every morning, at 5:30, an elderly lady buys a loaf still warm and pays with a two-euro coin: it is Carmela. She never says anything, but she always leaves a small wildflower on the counter.`
  ]};
-
 var RED={it:[
-`Nicola: aveva debiti e ha ricevuto il messaggio di Rosa, ma ha la ricevuta di Molfetta delle 5:31. Marta: ha litigato con la madre, ma le foto sul Lungomare dicono 5:15 e 5:45.`,
-`Franco: trentacinque anni di lavoro buttati via e la chiave della porta dietro, ma la telecamera della stazione lo riprende fino alle 5:35, e la porta dietro era chiusa. Dario: ha trovato il corpo, ma il GPS lo ferma al deposito fino alle 5:55.`,
-`Giulia: poteva guadagnare molto, ma con Rosa morta il contratto saltava, e la videochiamata registrata la mostra in albergo per tutta l'ora.`],
- en:[`Nicola: debts and Rosa's message, but he has the Molfetta receipt of 5:31. Marta: she argued with her mother, but the seafront photos say 5:15 and 5:45.`,`Franco: thirty-five years of work thrown away and the key to the back door, but the station camera shows him until 5:35, and the back door was locked. Dario: he found the body, but the GPS has him at the depot until 5:55.`,`Giulia: she could gain a lot, but with Rosa dead the contract fell through, and the recorded video call shows her in the hotel for the whole hour.`]};
+ `Nicola: ha un ristorante e molti debiti, ma ha la ricevuta di Molfetta delle 5:31. Marta: ha litigato con la madre in passato, ma le foto sul Lungomare dicono 5:15 e 5:45.`,
+ `Elena: è l'amante di Franco e temeva che Rosa parlasse, ma la telecamera del negozio la mostra al lavoro per tutta l'ora. Dario: ha trovato il corpo, ma il GPS lo ferma al deposito fino alle 5:55.`,
+ `Giulia: ha rivelato il segreto a Rosa, ma era di turno in ospedale, con testimoni e cartellino. La vera pista era l'orario: i trentadue minuti vuoti di Franco tra le 5:20 e le 5:52.`],
+ en:[
+ `Nicola: he has a restaurant and a lot of debt, but he has the Molfetta receipt of 5:31. Marta: she argued with her mother in the past, but the seafront photos say 5:15 and 5:45.`,
+ `Elena: she is Franco's lover and feared that Rosa would talk, but the shop camera shows her at work for the whole hour. Dario: he found the body, but the GPS stops him at the depot until 5:55.`,
+ `Giulia: she revealed the secret to Rosa, but she was on shift at the hospital, with witnesses and a time card. The real lead was the timing: Franco's thirty-two empty minutes between 5:20 and 5:52.`]};
 
 /* ---------- app ---------- */
 var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var TTS=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
 var SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
-var SAY=TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'';
+var SAYB=TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'';
+var SAY='';
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function mk(s){return esc(s).replace(/\[([^|\]]+)\|([^\]]+)\]/g,function(m,a,b){return '<button type="button" class="w" data-act="w" data-t="'+b+'">'+a+'</button>'})}
 
@@ -368,6 +413,31 @@ var epiStep=0;var tab='caso',sus='',last=null,openEn={},pend='',selSus='',selPro
 function pname(p){var s=(S.names[p]||'').replace(/^\s+|\s+$/g,'');return s||('Giocatore '+(p+1))}
 function castById(id){for(var i=0;i<CAST.length;i++){if(CAST[i].id===id)return CAST[i]}return null}
 function av(f){if(f.img)return '<img class="av" alt="" src="'+f.img+'">';return '<span class="av" style="background:none;overflow:hidden" aria-hidden="true">'+faceSVG(f,52)+'</span>'}
+function pad2(n){return (n<10?'0':'')+n}
+function clockStr(){var m=(GAME.t0+S.used*GAME.dt)%1440;return pad2(Math.floor(m/60))+':'+pad2(m%60)}
+function clockHtml(){
+  var l=left(),pc=Math.round(100*S.used/B);
+  return '<div class="clock'+(l<=3?' hot':'')+'" role="status"><div class="clock-t"><b>'+clockStr()+'</b><span lang="it">'+esc(GAME.dl[0])+'</span><small lang="en">'+esc(GAME.dl[1])+'</small></div><div class="bar" aria-hidden="true"><i style="width:'+pc+'%"></i></div></div>';
+}
+function helpCard(compact){
+  var rows=[['<span class="demo">English</span>','Sotto ogni testo c\'è il bottone <b>English</b>: toccalo e leggi la traduzione.','Under every text there is an English button: tap it to read the translation.'],
+   ['<span class="demo w">parola</span>','Le parole <b>sottolineate</b> hanno un aiuto: toccale e compare il significato.','Underlined words have help: tap them and the meaning appears.'],
+   ['<span class="demo">Aa</span>','In alto, <b>Aa</b> apre il glossario completo, con ricerca.','At the top, Aa opens the full glossary, with search.'],
+   ['<span class="demo">EN</span>','In alto, <b>EN</b> mostra sempre tutte le traduzioni.','At the top, EN always shows every translation.']];
+  if(!compact&&SAY)rows.push(['<span class="demo">&#128266;</span>','L\'altoparlante legge il testo in italiano.','The speaker reads the text aloud in Italian.']);
+  var list='<ul class="hl">'+rows.map(function(r){return '<li>'+r[0]+'<span><span lang="it">'+r[1]+'</span><small lang="en">'+r[2]+'</small></span></li>'}).join('')+'</ul>';
+  if(compact)return '<details class="card help"><summary><b>Traduzione e glossario: come si usano</b><small lang="en" style="display:block">English translation and glossary: how to use them</small></summary>'+list+'</details>';
+  return '<div class="card help"><div class="card-h"><span class="tag">Traduzione e glossario</span></div><p class="it" lang="it"><b>Tutto il gioco ha la traduzione in inglese e il glossario.</b></p><p class="en" lang="en">The whole game has an English translation and a glossary.</p>'+list+'</div>';
+}
+function timelineHtml(){
+  var vis=TIMELINE.filter(function(e){return e.a?(S.asked[e.a.split('.')[0]]&&S.asked[e.a.split('.')[0]][e.a.split('.')[1]]):S.used>=e.at});
+  var h='<h3 lang="it" style="margin-top:6px">La linea del tempo<small lang="en" style="display:block;font-weight:400">The timeline: it fills in as you investigate</small></h3><div class="card"><ol class="tl">';
+  if(!vis.length)h+='<li><span lang="it">Ancora niente. Interrogate i sospettati!</span><small lang="en">Nothing yet. Question the suspects!</small></li>';
+  vis.forEach(function(e){h+='<li><b>'+esc(e.t)+'</b><span><span class="it" lang="it">'+mk(e.it)+'</span><small lang="en">'+esc(e.en)+'</small></span></li>'});
+  var hid=TIMELINE.length-vis.length;
+  if(hid>0)h+='<li class="unk"><b>?</b><span><span lang="it">Altri momenti da scoprire: '+hid+'</span><small lang="en">More moments to discover: '+hid+'</small></span></li>';
+  return h+'</ol><div class="gloss" hidden></div></div>';
+}
 function left(){return Math.max(0,B-S.used)}
 function unlocked(){return REPORTS.filter(function(r){return S.used>=r.at})}
 
@@ -403,17 +473,17 @@ function viewSetup(){
   var rules=[GAME.rule1,['A turno, scegliete un sospettato e fate una domanda.','Take turns: choose a suspect and ask a question.'],['Leggete la risposta a voce alta. Scrivete nel taccuino.','Read the answer out loud. Write in the notebook.'],['Avete solo '+B+' domande. Scegliete bene!','You only have '+B+' questions. Choose well!'],['Poi accusate il colpevole con tre prove.','Then accuse the culprit with three proofs.']];
   return '<div class="stack"><h2>'+esc(GAME.q[0])+'</h2><p class="it" lang="it">'+esc(GAME.intro[0])+'</p><p class="en" lang="en">'+esc(GAME.intro[1])+'</p></div>'+
    '<section class="stack"><div class="q" lang="it">Quanti giocatori siete?<small lang="en">How many players? (1–10). Everyone shares one phone, or each plays on their own.</small></div><div class="chips">'+chips+'</div>'+(names?'<div class="q" lang="it">I nomi<small lang="en">Names (optional)</small></div><div class="stack">'+names+'</div>':'')+'</section>'+
-   '<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+rules.map(function(r){return '<li>'+esc(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>'+
+   helpCard(false)+'<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+rules.map(function(r){return '<li>'+esc(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>'+
    '<button type="button" class="btn tape" data-act="start">Inizia l\'indagine<small>Start the investigation</small></button>'+
    '<button type="button" class="link" data-act="teacher">Per l\'insegnante / For the teacher</button>'+(teacherOpen?'<div class="card"><h3>Soluzione / Solution</h3><p>'+esc(TEACHER)+'</p></div>':'');
 }
 function viewCaso(){
-  S.seen=unlocked().length;save();
-  var h='<h2>Il caso</h2>'+cardHtml('story','La storia','',STORY.it,STORY.en,IMGS.scena);
-  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who">'+av(VICTIM.face)+'<div><b>'+esc(VICTIM.name)+'</b><span lang="it">'+esc(VICTIM.it)+'</span><small lang="en" style="display:block">'+esc(VICTIM.en)+'</small></div></div></div>';
+  var seenBefore=S.seen;S.seen=unlocked().length;save();
+  var h='<h2>Il caso</h2>'+clockHtml()+helpCard(true)+cardHtml('story','La storia','',STORY.it,STORY.en,IMGS.scena);
+  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who">'+av(VICTIM.face)+'<div><b>'+esc(VICTIM.name)+'</b><span lang="it">'+esc(VICTIM.it)+'</span><small lang="en" style="display:block">'+esc(VICTIM.en)+'</small></div></div>'+(VICTIM.bio?'<p class="it" lang="it">'+mk(VICTIM.bio[0])+'</p><div class="gloss" hidden></div><small lang="en">'+esc(VICTIM.bio[1])+'</small>':'')+'</div>';
   h+='<h3 lang="it" style="margin-top:6px">'+esc(GAME.reportsH)+'</h3>';
   var un=unlocked();
-  un.slice().reverse().forEach(function(r,i){var idx=un.length-1-i;h+=cardHtml('rep'+idx,'Rapporto '+(idx+1),r.t,r.it,r.en,r.img?IMGS[r.img]:'')});
+  un.forEach(function(r,idx){h+=cardHtml('rep'+idx,(r.twist?'Colpo di scena':'Rapporto '+(idx+1))+(idx>=seenBefore&&seenBefore>0?' · NUOVO':''),r.t,r.it,r.en,r.img?IMGS[r.img]:'')});
   var nx=REPORTS.filter(function(r){return S.used<r.at})[0];
   if(nx)h+='<div class="card ask"><p class="it" lang="it">Un nuovo rapporto arriva dopo <b>'+(nx.at-S.used)+'</b> '+((nx.at-S.used)===1?'domanda':'domande')+'.</p><p class="en" lang="en">A new report arrives after '+(nx.at-S.used)+' more '+((nx.at-S.used)===1?'question':'questions')+'.</p></div>';
   h+='<button type="button" class="btn tape" data-act="tab" data-v="interroga">Interroga i sospettati<small>Question the suspects</small></button>';
@@ -426,7 +496,8 @@ function turnBanner(){
   return '<div class="turn"><span lang="it">Turno di <b>'+esc(pname(S.turn%S.n))+'</b></span><small lang="en">Choose a suspect and ask a question</small></div>';
 }
 function viewInterroga(){
-  var h='<h2>Interroga</h2>';
+  var h='<h2>Interroga</h2>'+clockHtml();
+  if(left()>0&&left()<=3)h+='<div class="msg" role="status"><span lang="it"><b>Il tempo sta finendo!</b> Restano solo '+left()+' domande.</span><span class="e" lang="en">Time is running out! Only '+left()+' questions left.</span></div>';
   if(left()===0)h+='<div class="msg" role="status"><span lang="it">Le domande sono finite. È il momento di accusare!</span><span class="e" lang="en">No questions left. Time to accuse!</span></div>';
   if(last){
     var c=castById(last.s),q=QS.filter(function(x){return x.k===last.k})[0];
@@ -471,6 +542,7 @@ function viewNote(){
     h+='</tr>';
   });
   h+='</tbody></table></div><div class="card"><p class="it" lang="it">Esempio: Nicola ha una chiave? Se sì, tocca <b>Sì</b> nella colonna Chiave.</p><p class="en" lang="en">Example: does Nicola have a key? If yes, tap Yes in the Key column.</p></div>';
+  h+=timelineHtml();
   h+='<h3 lang="it" style="margin-top:6px">I verbali (risposte dei sospettati)</h3>';
   var any=false;
   CAST.forEach(function(c){
@@ -538,7 +610,7 @@ function go(t){tab=t;pend='';sus='';last=null;render();window.scrollTo(0,0)}
 function glossary(){
   var map={},texts=[].concat(STORY.it,SOL.it,EPI.it);
   REPORTS.forEach(function(r){texts.push(r.it)});
-  CAST.forEach(function(c){texts.push(c.desc)});
+  CAST.forEach(function(c){texts.push(c.desc)});TIMELINE.forEach(function(e){texts.push(e.it)});if(VICTIM.bio)texts.push(VICTIM.bio[0]);
   Object.keys(ANS).forEach(function(id){Object.keys(ANS[id]).forEach(function(k){texts.push(ANS[id][k][0])})});
   texts.forEach(function(t){var re=/\[([^|\]]+)\|([^\]]+)\]/g,m;while((m=re.exec(t))){var key=m[1].toLowerCase();if(!map[key])map[key]=[m[1],m[2]]}});
   return Object.keys(map).sort(function(a,b){return a.localeCompare(b,'it')}).map(function(k){return map[k]});
@@ -555,16 +627,51 @@ function openGlossary(){
   el.innerHTML='<div class="wrap"><div class="row" style="justify-content:space-between;align-items:center"><h2>Parole</h2><button type="button" class="pill" data-act="closeglos">Chiudi</button></div><small>Glossario italiano → inglese / Italian → English glossary</small><input type="search" id="gs" placeholder="Cerca / Search" aria-label="Cerca / Search"><div id="gl-list">'+glList('')+'</div></div>';
   el.hidden=false;document.body.style.overflow='hidden';
 }
+var ITV=null,ITV_TRIED=false;
+function pickVoice(){
+  try{
+    var vs=window.speechSynthesis.getVoices()||[];
+    var it=vs.filter(function(v){return /^it([-_]|$)/i.test(v.lang)||/ital/i.test(v.name)});
+    if(!it.length)return null;
+    function sc(v){var n=v.name||'',x=0;if(/^it[-_]IT/i.test(v.lang))x+=3;if(/premium|enhanced|natural|neural|google|siri/i.test(n))x+=4;if(/alice|federica|elsa|paola|luca|isabella|diego|emma|giorgio/i.test(n))x+=2;if(v.localService===false)x+=1;return x}
+    it.sort(function(p,q){return sc(q)-sc(p)});
+    return it[0];
+  }catch(e){return null}
+}
+function refreshSay(){ITV=TTS?pickVoice():null;SAY=ITV?SAYB:''}
+refreshSay();
+if(TTS){try{window.speechSynthesis.onvoiceschanged=function(){var had=!!SAY;refreshSay();if(!!SAY!==had){var ap=document.getElementById('app');if(ap&&ap.innerHTML)render()}};if(window.speechSynthesis.getVoices)window.speechSynthesis.getVoices()}catch(e){}}
+function prepSpeech(t){
+  return t.replace(/[«»“”"]/g,'').replace(/\s+/g,' ')
+   .replace(/\b(\d{1,2}):00\b/g,'$1 in punto')
+   .replace(/\b(\d{1,2}):(\d{2})\b/g,'$1 e $2')
+   .replace(/\s*[—–]\s*/g,', ').replace(/…/g,'.').trim();
+}
+function chunks(t){
+  var parts=t.match(/[^.!?;:]+[.!?;:]*/g)||[t],out=[],cur='';
+  parts.forEach(function(p){if((cur+p).length>170&&cur){out.push(cur);cur=p}else cur+=p});
+  if(cur)out.push(cur);
+  return out.map(function(x){return x.trim()}).filter(Boolean);
+}
 function speak(card,btn){
   if(!TTS)return;
   try{
     var ss=window.speechSynthesis;
     if(btn.getAttribute('aria-pressed')==='true'){ss.cancel();btn.setAttribute('aria-pressed','false');return}
     ss.cancel();$$('.ico[aria-pressed="true"]').forEach(function(b){b.setAttribute('aria-pressed','false')});
-    var txt=$$('.it',card).map(function(n){return n.textContent}).join(' ');
-    var u=new SpeechSynthesisUtterance(txt);u.lang='it-IT';u.rate=0.85;
-    var v=ss.getVoices().filter(function(x){return /^it/i.test(x.lang)})[0];if(v)u.voice=v;
-    btn.setAttribute('aria-pressed','true');u.onend=u.onerror=function(){btn.setAttribute('aria-pressed','false')};ss.speak(u);
+    var txt=prepSpeech($$('.it',card).map(function(n){return n.textContent}).join(' '));
+    var v=ITV||pickVoice();ITV=v;
+    var gl=$('.gloss',card);
+    if(!v&&gl){gl.innerHTML='Voce italiana non trovata sul telefono. Nelle impostazioni, scarica o scegli una voce italiana (Sintesi vocale).<br><i>Italian voice not found on your phone. In Settings, download or choose an Italian voice (Text-to-speech).</i>';gl.hidden=false}
+    var list=chunks(txt),i=0;
+    btn.setAttribute('aria-pressed','true');
+    (function next(){
+      if(i>=list.length||btn.getAttribute('aria-pressed')!=='true'){btn.setAttribute('aria-pressed','false');return}
+      var u=new SpeechSynthesisUtterance(list[i++]);
+      u.lang=v?v.lang.replace('_','-'):'it-IT';if(v)u.voice=v;u.rate=0.92;u.pitch=1;
+      u.onend=next;u.onerror=function(){btn.setAttribute('aria-pressed','false')};
+      ss.speak(u);
+    })();
   }catch(e){btn.setAttribute('aria-pressed','false')}
 }
 document.addEventListener('click',function(ev){

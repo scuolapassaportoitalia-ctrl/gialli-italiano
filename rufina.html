@@ -168,6 +168,33 @@ span.av{background:none}
 .who .ico{margin-left:auto}
 .stars{background:var(--tape);color:#15202B;padding:4px 12px;border-radius:4px;display:inline-block;font-size:28px;letter-spacing:6px}
 .pill.cnt{background:var(--tape);color:#15202B;border-color:#15202B;font-size:20px;line-height:1}
+
+.clock{border:2px solid var(--fg);background:var(--surface);border-radius:6px;padding:10px 12px}
+.clock-t{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.clock-t b{font-family:var(--display);font-size:30px;line-height:1}
+.clock-t span{font-size:15px}.clock-t small{width:100%;font-size:13px;color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:4px;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--tape)}
+.clock.hot{border-color:#b3261e}.clock.hot .bar i{background:#b3261e}.clock.hot b{color:#b3261e}
+.help{border:2px dashed var(--fg)}
+.hl{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px}
+.hl li{display:flex;gap:12px;align-items:flex-start}
+.hl li>span:last-child{flex:1;display:block}.hl small{display:block;color:var(--muted)}
+.demo{display:inline-block;width:78px;text-align:center;font-weight:700;border:2px solid var(--fg);border-radius:6px;padding:4px 6px;background:var(--surface);flex:none;font-size:14px}
+.demo.w{border:0;border-bottom:2px dotted var(--fg);border-radius:0;background:none}
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.tl li{display:flex;gap:12px;align-items:flex-start;border-left:4px solid var(--tape);padding-left:10px}
+.tl li b{font-family:var(--display);font-size:20px;min-width:54px}
+.tl li>span{flex:1;display:block}.tl small{display:block;color:var(--muted);font-size:13px}
+.tl li.unk{border-left-color:var(--line);color:var(--muted)}
+.entog{font-weight:700;padding:10px 16px;min-height:44px}
+img.av,span.av{width:104px;height:104px;border-radius:10px;object-fit:cover;object-position:50% 20%;border:2px solid var(--fg);flex:none}
+span.av svg{width:100%;height:100%}
+.sus img.av,.sus span.av{width:84px;height:84px}
+.bubble .who img.av,.bubble .who span.av{width:76px;height:76px}
+.sus{min-height:96px}
+.fig.sm{max-width:none;width:100%}
+.fig img,.fig svg{width:100%;height:auto;min-height:220px;object-fit:cover}
 </style>
 
 <div id="app"></div>
@@ -201,7 +228,7 @@ var GAME={key:'delitto-a-villa-rufina-v3',title:'Delitto a Villa Rufina',sub:'Ai
  intro:['Un giallo nel Chianti. Interrogate i sospettati e aiutate il vicequestore Volponi.','A mystery in the Chianti hills. Question the suspects and help Deputy Chief Volponi.'],
  rule1:[`Voi siete gli assistenti del vicequestore Volponi.`,`You are Deputy Chief Volponi's assistants.`],
  reportsH:'Rapporti del vicequestore Volponi',fromIt:'del vicequestore Volponi',fromEn:'from Deputy Chief Volponi',
- helpTag:'Aiuto di Volponi',helpBtn:['Chiedi un aiuto a Volponi','Ask Volponi for help · costs 2 questions']};
+ t0:15*60+50,dt:9,dl:['Alle 18:00 arriva il magistrato e gli avvocati: dopo quell\'ora nessuno parlerà più.','At 6:00 p.m. the magistrate and the lawyers arrive: after that hour nobody will talk any more.'],helpTag:'Aiuto di Volponi',helpBtn:['Chiedi un aiuto a Volponi','Ask Volponi for help · costs 2 questions']};
 var IMGS={};
 var CAST=[
  {id:'filippo',name:'Filippo Ricci',age:38,role:'figlio della Contessa',roleEn:"the Countess's son",desc:`Ama le auto sportive e il [lusso|luxury].`,descEn:'He loves sports cars and luxury.',face:{}},
@@ -268,25 +295,40 @@ var ANS={
   key:[`La pianta di cicuta è in fondo alla serra, dietro le orchidee. Con la sedia a rotelle non potrei mai arrivarci, perché il passaggio è stretto: lo sapevamo tutti dopo la festa di Guglielmo.`,`The hemlock plant is at the back of the greenhouse, behind the orchids. With the wheelchair I could never get there, because the passage is narrow: we all knew after Guglielmo's party.`],
   know:[`Sì, c'è una cosa. Ho scritto ad Aurora perché era l'unica che potesse convincere Carlotta, con i suoi argomenti da economista. Lei mi ha risposto soltanto: «Ci penso io.» Allora non ho capito che cosa intendesse.`,`Yes, there is one thing. I wrote to Aurora because she was the only one who could convince Carlotta, with her economist's arguments. She only answered: "I will take care of it." At the time I did not understand what she meant.`]}
 };
+var TIMELINE=[
+ {t:'11:30',a:'sofia.know',it:`Sofia scrive ad Aurora: «Dobbiamo far cambiare idea a Carlotta!» Aurora risponde: «Ci penso io.»`,en:`Sofia writes to Aurora: "We must make Carlotta change her mind!" Aurora replies: "I will take care of it."`},
+ {t:'13:30',at:3,it:`A pranzo la Contessa annuncia: «Alle 17:00, in giardino, vi dirò il nome dell'azienda.»`,en:`At lunch the Countess announces: "At 5:00 p.m., in the garden, I will tell you the name of the company."`},
+ {t:'14:00',a:'filippo.alibi',it:`Filippo e Ascanio cominciano a parlare di investimenti, in salotto.`,en:`Filippo and Ascanio start talking about investments, in the living room.`},
+ {t:'14:30',a:'guglielmo.alibi',it:`Guglielmo comincia a giocare a tennis con Claudio. Giada comincia la diretta Instagram.`,en:`Guglielmo starts playing tennis with Claudio. Giada starts her Instagram live.`},
+ {t:'14:30',a:'vittorio.know',it:`La Contessa telefona al cuoco: vuole due tazze della solita tisana in serra, alle 15:00.`,en:`The Countess phones the cook: she wants two cups of the usual herbal tea in the greenhouse, at 3:00.`},
+ {t:'14:45',a:'vittorio.know',it:`Qualcuno telefona a Vittorio: «In cantina si rompono delle bottiglie!» Il cuoco corre giù.`,en:`Someone phones Vittorio: "Some bottles are breaking in the cellar!" The cook runs down.`},
+ {t:'15:00',a:'ascanio.know',it:`Il telefono della cucina squilla. Ascanio sente Vittorio correre verso la cantina.`,en:`The kitchen phone rings. Ascanio hears Vittorio running towards the cellar.`},
+ {t:'15:10',a:'maria.alibi',it:`Maria porta le due tazze di tisana in serra.`,en:`Maria takes the two cups of herbal tea to the greenhouse.`},
+ {t:'15:15',a:'giada.know',it:`Giada vede una figura che cammina in fretta, dai vigneti verso la villa.`,en:`Giada sees a figure walking quickly, from the vineyards towards the villa.`},
+ {t:'15:30',a:'ludovica.know',it:`Ludovica vede Aurora tornare dai vigneti, un po' agitata.`,en:`Ludovica sees Aurora coming back from the vineyards, a little agitated.`},
+ {t:'15:40',at:0,it:`Maria trova la Contessa a terra, nella serra. La porta sul retro è aperta.`,en:`Maria finds the Countess on the floor, in the greenhouse. The back door is open.`}
+];
 var STORY={
  it:[
-  `[Villa Rufina|Villa Rufina] è una [tenuta|estate] elegante nel Chianti, in Toscana: colline dolci, vigneti a perdita d'occhio e cantine centenarie. La famiglia Ricci produce vino da quattro generazioni, e da molti anni l'azienda è guidata dalla Contessa Carlotta Ricci.`,
-  `Da qualche settimana i giornali non parlano d'altro: la Contessa [intende|intends] vendere le cantine a un'azienda straniera, per quindici milioni di euro. Per questo, nel fine settimana, ha convocato tutta la famiglia a pranzo, anche se nessuno sa ancora quale sia il nome dell'azienda.`,
-  `Alle 15:40 la cameriera, Maria, trova la Contessa a terra nella [serra|greenhouse]. Il vicequestore Volponi arriva pochi minuti dopo, fa chiudere i cancelli e dichiara: «Nessuno lascerà la villa. L'assassino è ancora qui, tra voi.»`,
-  `Nove persone, un solo colpevole. Voi siete gli assistenti del vicequestore: [interrogate|question] i sospettati, confrontate le loro versioni con i fatti e scoprite chi mente. Attenzione: avete soltanto 14 domande.`
+  `Sabato, ore 13:30. [Villa Rufina|Villa Rufina] è una [tenuta|estate] elegante nel Chianti, in Toscana: colline dolci, vigneti a perdita d'occhio e cantine centenarie. La famiglia Ricci produce vino da quattro generazioni, e da molti anni l'azienda è guidata dalla Contessa Carlotta Ricci.`,
+  `Da qualche settimana i giornali non parlano d'altro: la Contessa [intende|intends] vendere le cantine a un'azienda straniera, per quindici milioni di euro. Per questo ha convocato tutta la famiglia a pranzo. Alla fine del pranzo si alza e dice: «Alle 17:00, in giardino, vi dirò il nome dell'azienda.» Poi esce, con un sorriso strano. Nessuno la vedrà più viva.`,
+  `Alle 15:40 la cameriera, Maria, trova la Contessa a terra nella [serra|greenhouse]. Muore pochi minuti dopo. Il vicequestore Volponi arriva in fretta, fa chiudere i cancelli e dichiara: «Nessuno lascerà la villa. L'assassino è ancora qui, tra voi.»`,
+  `Sono le 15:50. Alle 18:00 arriveranno il magistrato e gli avvocati: dopo quell'ora, nessuno parlerà più. Nove persone, un solo colpevole. Voi siete gli assistenti del vicequestore: [interrogate|question] i sospettati, leggete i rapporti, confrontate le loro versioni con i fatti e scoprite chi mente. Ogni domanda costa nove minuti: ne avete soltanto 14.`
  ],
  en:[
-  `Villa Rufina is an elegant estate in the Chianti hills, in Tuscany: gentle hills, vineyards as far as the eye can see and centuries-old cellars. The Ricci family has made wine for four generations, and for many years the company has been run by Countess Carlotta Ricci.`,
-  `For a few weeks the newspapers have talked about nothing else: the Countess intends to sell the wine cellars to a foreign company, for fifteen million euros. That is why, at the weekend, she called the whole family to lunch, even though nobody yet knows the name of the company.`,
-  `At 3:40 p.m. the maid, Maria, finds the Countess on the floor in the greenhouse. Deputy Chief Volponi arrives a few minutes later, has the gates closed and declares: "Nobody will leave the villa. The murderer is still here, among you."`,
-  `Nine people, one culprit. You are the deputy chief's assistants: question the suspects, compare their versions with the facts and find out who is lying. Be careful: you only have 14 questions.`
+  `Saturday, 1:30 p.m. Villa Rufina is an elegant estate in the Chianti hills, in Tuscany: gentle hills, vineyards as far as the eye can see and centuries-old cellars. The Ricci family has made wine for four generations, and for many years the company has been run by Countess Carlotta Ricci.`,
+  `For a few weeks the newspapers have talked about nothing else: the Countess intends to sell the wine cellars to a foreign company, for fifteen million euros. That is why she called the whole family to lunch. At the end of lunch she stands up and says: "At 5:00 p.m., in the garden, I will tell you the name of the company." Then she goes out, with a strange smile. Nobody will see her alive again.`,
+  `At 3:40 p.m. the maid, Maria, finds the Countess on the floor in the greenhouse. She dies a few minutes later. Deputy Chief Volponi arrives quickly, has the gates closed and declares: "Nobody will leave the villa. The murderer is still here, among you."`,
+  `It is 3:50 p.m. At 6:00 the magistrate and the lawyers will arrive: after that hour, nobody will talk any more. Nine people, one culprit. You are the deputy chief's assistants: question the suspects, read the reports, compare their versions with the facts and find out who is lying. Every question costs nine minutes: you only have 14.`
  ]
 };
 var REPORTS=[
  {at:0,t:'Il ritrovamento',it:`Alle 15:40 Maria trova la Contessa a terra, nella [serra|greenhouse]. Respira a fatica, ha le mani fredde e [fatica a parlare|has trouble speaking]. Muore poco dopo, prima dell'arrivo dell'ambulanza. La sua mano destra è chiusa a [pugno|fist], con le dita rigide. Il medico commenta: «È una posizione strana, quasi voluta. Come se volesse indicare qualcosa.»`,en:`At 3:40 Maria finds the Countess on the floor, in the greenhouse. She is breathing with difficulty, her hands are cold and she has trouble speaking. She dies shortly after, before the ambulance arrives. Her right hand is closed in a fist, with stiff fingers. The doctor comments: "It is a strange position, almost deliberate. As if she wanted to point to something."`,img:'pugno'},
  {at:0,t:'Il laboratorio',it:`Sul tavolino della serra c'è una tazza di [tisana|herbal tea] ancora piena. Sul pavimento ce n'è un'altra, identica, [rovesciata|knocked over]: la Contessa ha bevuto da questa. Le impronte sono soltanto quelle di Maria e della Contessa. Il laboratorio analizza la tisana versata: contiene [cicuta|hemlock] in dose mortale. Anche il barattolo della tisana in dispensa contiene qualche foglia di cicuta mescolata alle erbe.`,en:`On the small table in the greenhouse there is a cup of herbal tea that is still full. On the floor there is another, identical one, knocked over: the Countess drank from this one. The fingerprints are only those of Maria and the Countess. The laboratory analyses the spilled tea: it contains hemlock in a deadly dose. The tea jar in the pantry also contains a few hemlock leaves mixed with the herbs.`,img:'tazze'},
  {at:3,t:'Il pranzo',it:`Dopo il pranzo di famiglia la Contessa si è alzata e ha annunciato: «Oggi alle 17:00, in giardino, vi dirò il nome dell'azienda che compra le cantine.» Finora nessuno conosce quel nome. La Contessa vuole usare il ricavato per creare una [fondazione|foundation] dedicata alle persone [non udenti|deaf]: è un progetto personale, che porta avanti da anni.`,en:`After the family lunch the Countess stood up and announced: "Today at 5:00, in the garden, I will tell you the name of the company that is buying the wine cellars." So far nobody knows that name. The Countess wants to use the proceeds to set up a foundation for deaf people: it is a personal project that she has been pursuing for years.`,img:'villa'},
+ {at:4,twist:true,t:'Filippo fermato',it:`La polizia scopre che Filippo ha chiesto a sua madre un anticipo di duecentomila euro tre giorni fa e che non ha ancora pagato la sua macchina sportiva. Filippo viene fermato. «Ero in salotto con Ascanio, tutto il tempo!» Ma i due si garantiscono a vicenda, e il vicequestore sospetta che si coprano. Per molti, il colpevole è lui.`,en:`The police discover that Filippo asked his mother for an advance of two hundred thousand euros three days ago and that he has not yet paid for his sports car. Filippo is stopped. "I was in the living room with Ascanio, the whole time!" But the two vouch for each other, and the deputy chief suspects they are covering for each other. For many, he is the culprit.`},
  {at:6,t:'Il codice dei segni',it:`Nello studio della Contessa c'è un poster con l'[alfabeto dei segni|sign language alphabet] usato dalle persone sorde: il pugno chiuso rappresenta la lettera A. Sulla scrivania c'è un [biglietto|note] scritto con il codice dei segni. Dice: «SERRA ORE 15». Solo la Contessa lo capisce: sembra scritto da qualcuno che voleva essere certo che nessun altro lo leggesse.`,en:`In the Countess's study there is a poster with the sign language alphabet used by deaf people: the closed fist represents the letter A. On the desk there is a note written in the sign code. It says: "GREENHOUSE 3 PM". Only the Countess understands it: it looks as if it was written by someone who wanted to be sure that nobody else could read it.`,img:'segni'},
+ {at:8,twist:true,t:'La telecamera del salotto',it:`Colpo di scena! La telecamera di sicurezza del salotto mostra Filippo e Ascanio seduti sulle poltrone dalle 14:00 alle 15:40: non si sono mai alzati. Filippo viene rilasciato. Volponi riflette: «Allora Ascanio non può essere la A del pugno. Chi altro, in questa casa, ha un nome con la A e nessuno che possa dire dove fosse?»`,en:`Plot twist! The living room security camera shows Filippo and Ascanio sitting in the armchairs from 2:00 to 3:40: they never got up. Filippo is released. Volponi reflects: "Then Ascanio cannot be the A of the fist. Who else in this house has a name with an A and nobody who can say where they were?"`},
  {at:9,t:'La pianta e la festa',it:`In un angolo nascosto della serra Volponi trova una pianta di cicuta: alcune foglie sono state [strappate|torn off] di recente. Quattro mesi fa, durante la festa di Guglielmo, alcuni invitati erano finiti al pronto soccorso: nel cibo c'erano tracce di cicuta, ma in dose non mortale. Dopo, la famiglia ha spostato la pianta in un angolo lontano dalle erbe aromatiche. Tutti i familiari sanno dove si trova; Maria e Vittorio, invece, non vanno mai in quell'angolo.`,en:`In a hidden corner of the greenhouse Volponi finds a hemlock plant: some leaves have been torn off recently. Four months ago, during Guglielmo's party, some guests had ended up in the emergency room: there were traces of hemlock in the food, but in a non-deadly dose. Afterwards, the family moved the plant to a corner away from the aromatic herbs. All the family members know where it is; Maria and Vittorio, however, never go to that corner.`},
  {at:12,t:'Il computer di Aurora',it:`Sul computer di Aurora la polizia trova la cronologia degli acquisti: tre libri comprati online. «Gestione aziendale», «Vita di Socrate» e «Marketing vincente». Il secondo è stato ordinato due settimane fa. Nessuno ha visto Aurora per tutto il pomeriggio.`,en:`On Aurora's computer the police find the purchase history: three books bought online. "Business Management", "Life of Socrates" and "Winning Marketing". The second was ordered two weeks ago. Nobody saw Aurora for the whole afternoon.`}
 ];
@@ -342,7 +384,7 @@ var RED={it:[
  `Vittorio: he prepared the tea, but he does not know the plant, he is allergic and has no irritation. Maria: she served the cups, but many people saw her and she never goes to that corner of the greenhouse. Sofia: against the sale, but with the physiotherapist and in a wheelchair.`,
  `Giada (Instagram live), Ludovica (time-stamped selfies) and Guglielmo (tennis with Claudio) have verifiable alibis. The accident at the party four months ago was only a rehearsal by Aurora.`]};
 CAST.forEach(function(c){if(FIMG[c.id])c.face.img=FIMG[c.id]});
-VICTIM.face.img=FIMG.contessa;
+VICTIM.face.img=FIMG.contessa;VICTIM.bio=[`Carlotta Ricci guidava l'azienda con mano ferma e con il sorriso. Da anni imparava la lingua dei segni, per una causa che le stava a cuore. Quel giorno, a pranzo, era agitata e felice: voleva dire a tutti una cosa importante, alle 17:00, in giardino. Non ha fatto in tempo.`,`Carlotta Ricci ran the company with a firm hand and a smile. For years she had been learning sign language, for a cause close to her heart. That day, at lunch, she was agitated and happy: she wanted to tell everyone something important, at 5:00 p.m., in the garden. She did not make it in time.`];
 IMGS.pugno=fig('<img src="'+FIMG.pugno+'" alt="La serra" loading="lazy">','La serra, dopo il delitto','The greenhouse, after the crime','sm');
 IMGS.tazze=fig('<img src="'+FIMG.tazze+'" alt="La tisana" loading="lazy">','La tisana rovesciata','The spilled herbal tea','sm');
 IMGS.villa=fig('<img src="'+FIMG.copertina+'" alt="Villa Rufina" loading="lazy">','Villa Rufina, al tramonto','Villa Rufina, at sunset','sm');
@@ -354,7 +396,8 @@ var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var TTS=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);
 var SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
-var SAY=TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'';
+var SAYB=TTS?'<button type="button" class="ico" data-act="say" aria-pressed="false" aria-label="Ascolta / Listen">'+SPK+'</button>':'';
+var SAY='';
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function mk(s){return esc(s).replace(/\[([^|\]]+)\|([^\]]+)\]/g,function(m,a,b){return '<button type="button" class="w" data-act="w" data-t="'+b+'">'+a+'</button>'})}
 
@@ -367,6 +410,31 @@ var epiStep=0;var tab='caso',sus='',last=null,openEn={},pend='',selSus='',selPro
 function pname(p){var s=(S.names[p]||'').replace(/^\s+|\s+$/g,'');return s||('Giocatore '+(p+1))}
 function castById(id){for(var i=0;i<CAST.length;i++){if(CAST[i].id===id)return CAST[i]}return null}
 function av(f){if(f.img)return '<img class="av" alt="" src="'+f.img+'">';return '<span class="av" style="background:none;overflow:hidden" aria-hidden="true">'+faceSVG(f,52)+'</span>'}
+function pad2(n){return (n<10?'0':'')+n}
+function clockStr(){var m=(GAME.t0+S.used*GAME.dt)%1440;return pad2(Math.floor(m/60))+':'+pad2(m%60)}
+function clockHtml(){
+  var l=left(),pc=Math.round(100*S.used/B);
+  return '<div class="clock'+(l<=3?' hot':'')+'" role="status"><div class="clock-t"><b>'+clockStr()+'</b><span lang="it">'+esc(GAME.dl[0])+'</span><small lang="en">'+esc(GAME.dl[1])+'</small></div><div class="bar" aria-hidden="true"><i style="width:'+pc+'%"></i></div></div>';
+}
+function helpCard(compact){
+  var rows=[['<span class="demo">English</span>','Sotto ogni testo c\'è il bottone <b>English</b>: toccalo e leggi la traduzione.','Under every text there is an English button: tap it to read the translation.'],
+   ['<span class="demo w">parola</span>','Le parole <b>sottolineate</b> hanno un aiuto: toccale e compare il significato.','Underlined words have help: tap them and the meaning appears.'],
+   ['<span class="demo">Aa</span>','In alto, <b>Aa</b> apre il glossario completo, con ricerca.','At the top, Aa opens the full glossary, with search.'],
+   ['<span class="demo">EN</span>','In alto, <b>EN</b> mostra sempre tutte le traduzioni.','At the top, EN always shows every translation.']];
+  if(!compact&&SAY)rows.push(['<span class="demo">&#128266;</span>','L\'altoparlante legge il testo in italiano.','The speaker reads the text aloud in Italian.']);
+  var list='<ul class="hl">'+rows.map(function(r){return '<li>'+r[0]+'<span><span lang="it">'+r[1]+'</span><small lang="en">'+r[2]+'</small></span></li>'}).join('')+'</ul>';
+  if(compact)return '<details class="card help"><summary><b>Traduzione e glossario: come si usano</b><small lang="en" style="display:block">English translation and glossary: how to use them</small></summary>'+list+'</details>';
+  return '<div class="card help"><div class="card-h"><span class="tag">Traduzione e glossario</span></div><p class="it" lang="it"><b>Tutto il gioco ha la traduzione in inglese e il glossario.</b></p><p class="en" lang="en">The whole game has an English translation and a glossary.</p>'+list+'</div>';
+}
+function timelineHtml(){
+  var vis=TIMELINE.filter(function(e){return e.a?(S.asked[e.a.split('.')[0]]&&S.asked[e.a.split('.')[0]][e.a.split('.')[1]]):S.used>=e.at});
+  var h='<h3 lang="it" style="margin-top:6px">La linea del tempo<small lang="en" style="display:block;font-weight:400">The timeline: it fills in as you investigate</small></h3><div class="card"><ol class="tl">';
+  if(!vis.length)h+='<li><span lang="it">Ancora niente. Interrogate i sospettati!</span><small lang="en">Nothing yet. Question the suspects!</small></li>';
+  vis.forEach(function(e){h+='<li><b>'+esc(e.t)+'</b><span><span class="it" lang="it">'+mk(e.it)+'</span><small lang="en">'+esc(e.en)+'</small></span></li>'});
+  var hid=TIMELINE.length-vis.length;
+  if(hid>0)h+='<li class="unk"><b>?</b><span><span lang="it">Altri momenti da scoprire: '+hid+'</span><small lang="en">More moments to discover: '+hid+'</small></span></li>';
+  return h+'</ol><div class="gloss" hidden></div></div>';
+}
 function left(){return Math.max(0,B-S.used)}
 function unlocked(){return REPORTS.filter(function(r){return S.used>=r.at})}
 
@@ -402,17 +470,17 @@ function viewSetup(){
   var rules=[GAME.rule1,['A turno, scegliete un sospettato e fate una domanda.','Take turns: choose a suspect and ask a question.'],['Leggete la risposta a voce alta. Scrivete nel taccuino.','Read the answer out loud. Write in the notebook.'],['Avete solo '+B+' domande. Scegliete bene!','You only have '+B+' questions. Choose well!'],['Poi accusate il colpevole con tre prove.','Then accuse the culprit with three proofs.']];
   return '<div class="stack"><h2>'+esc(GAME.q[0])+'</h2><p class="it" lang="it">'+esc(GAME.intro[0])+'</p><p class="en" lang="en">'+esc(GAME.intro[1])+'</p></div>'+
    '<section class="stack"><div class="q" lang="it">Quanti giocatori siete?<small lang="en">How many players? (1–10). Everyone shares one phone, or each plays on their own.</small></div><div class="chips">'+chips+'</div>'+(names?'<div class="q" lang="it">I nomi<small lang="en">Names (optional)</small></div><div class="stack">'+names+'</div>':'')+'</section>'+
-   '<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+rules.map(function(r){return '<li>'+esc(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>'+
+   helpCard(false)+'<div class="card"><div class="card-h"><span class="tag">Come si gioca</span></div><ol class="steps">'+rules.map(function(r){return '<li>'+esc(r[0])+'<span lang="en">'+esc(r[1])+'</span></li>'}).join('')+'</ol></div>'+
    '<button type="button" class="btn tape" data-act="start">Inizia l\'indagine<small>Start the investigation</small></button>'+
    '<button type="button" class="link" data-act="teacher">Per l\'insegnante / For the teacher</button>'+(teacherOpen?'<div class="card"><h3>Soluzione / Solution</h3><p>'+esc(TEACHER)+'</p></div>':'');
 }
 function viewCaso(){
-  S.seen=unlocked().length;save();
-  var h='<h2>Il caso</h2>'+cardHtml('story','La storia','',STORY.it,STORY.en,IMGS.scena);
-  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who">'+av(VICTIM.face)+'<div><b>'+esc(VICTIM.name)+'</b><span lang="it">'+esc(VICTIM.it)+'</span><small lang="en" style="display:block">'+esc(VICTIM.en)+'</small></div></div></div>';
+  var seenBefore=S.seen;S.seen=unlocked().length;save();
+  var h='<h2>Il caso</h2>'+clockHtml()+helpCard(true)+cardHtml('story','La storia','',STORY.it,STORY.en,IMGS.scena);
+  h+='<div class="card"><div class="card-h"><span class="tag">La vittima</span></div><div class="who">'+av(VICTIM.face)+'<div><b>'+esc(VICTIM.name)+'</b><span lang="it">'+esc(VICTIM.it)+'</span><small lang="en" style="display:block">'+esc(VICTIM.en)+'</small></div></div>'+(VICTIM.bio?'<p class="it" lang="it">'+mk(VICTIM.bio[0])+'</p><div class="gloss" hidden></div><small lang="en">'+esc(VICTIM.bio[1])+'</small>':'')+'</div>';
   h+='<h3 lang="it" style="margin-top:6px">'+esc(GAME.reportsH)+'</h3>';
   var un=unlocked();
-  un.slice().reverse().forEach(function(r,i){var idx=un.length-1-i;h+=cardHtml('rep'+idx,'Rapporto '+(idx+1),r.t,r.it,r.en,r.img?IMGS[r.img]:'')});
+  un.forEach(function(r,idx){h+=cardHtml('rep'+idx,(r.twist?'Colpo di scena':'Rapporto '+(idx+1))+(idx>=seenBefore&&seenBefore>0?' · NUOVO':''),r.t,r.it,r.en,r.img?IMGS[r.img]:'')});
   var nx=REPORTS.filter(function(r){return S.used<r.at})[0];
   if(nx)h+='<div class="card ask"><p class="it" lang="it">Un nuovo rapporto arriva dopo <b>'+(nx.at-S.used)+'</b> '+((nx.at-S.used)===1?'domanda':'domande')+'.</p><p class="en" lang="en">A new report arrives after '+(nx.at-S.used)+' more '+((nx.at-S.used)===1?'question':'questions')+'.</p></div>';
   h+='<button type="button" class="btn tape" data-act="tab" data-v="interroga">Interroga i sospettati<small>Question the suspects</small></button>';
@@ -425,7 +493,8 @@ function turnBanner(){
   return '<div class="turn"><span lang="it">Turno di <b>'+esc(pname(S.turn%S.n))+'</b></span><small lang="en">Choose a suspect and ask a question</small></div>';
 }
 function viewInterroga(){
-  var h='<h2>Interroga</h2>';
+  var h='<h2>Interroga</h2>'+clockHtml();
+  if(left()>0&&left()<=3)h+='<div class="msg" role="status"><span lang="it"><b>Il tempo sta finendo!</b> Restano solo '+left()+' domande.</span><span class="e" lang="en">Time is running out! Only '+left()+' questions left.</span></div>';
   if(left()===0)h+='<div class="msg" role="status"><span lang="it">Le domande sono finite. È il momento di accusare!</span><span class="e" lang="en">No questions left. Time to accuse!</span></div>';
   if(last){
     var c=castById(last.s),q=QS.filter(function(x){return x.k===last.k})[0];
@@ -470,6 +539,7 @@ function viewNote(){
     h+='</tr>';
   });
   h+='</tbody></table></div><div class="card"><p class="it" lang="it">Esempio: Nicola ha una chiave? Se sì, tocca <b>Sì</b> nella colonna Chiave.</p><p class="en" lang="en">Example: does Nicola have a key? If yes, tap Yes in the Key column.</p></div>';
+  h+=timelineHtml();
   h+='<h3 lang="it" style="margin-top:6px">I verbali (risposte dei sospettati)</h3>';
   var any=false;
   CAST.forEach(function(c){
@@ -537,7 +607,7 @@ function go(t){tab=t;pend='';sus='';last=null;render();window.scrollTo(0,0)}
 function glossary(){
   var map={},texts=[].concat(STORY.it,SOL.it,EPI.it);
   REPORTS.forEach(function(r){texts.push(r.it)});
-  CAST.forEach(function(c){texts.push(c.desc)});
+  CAST.forEach(function(c){texts.push(c.desc)});TIMELINE.forEach(function(e){texts.push(e.it)});if(VICTIM.bio)texts.push(VICTIM.bio[0]);
   Object.keys(ANS).forEach(function(id){Object.keys(ANS[id]).forEach(function(k){texts.push(ANS[id][k][0])})});
   texts.forEach(function(t){var re=/\[([^|\]]+)\|([^\]]+)\]/g,m;while((m=re.exec(t))){var key=m[1].toLowerCase();if(!map[key])map[key]=[m[1],m[2]]}});
   return Object.keys(map).sort(function(a,b){return a.localeCompare(b,'it')}).map(function(k){return map[k]});
@@ -554,16 +624,51 @@ function openGlossary(){
   el.innerHTML='<div class="wrap"><div class="row" style="justify-content:space-between;align-items:center"><h2>Parole</h2><button type="button" class="pill" data-act="closeglos">Chiudi</button></div><small>Glossario italiano → inglese / Italian → English glossary</small><input type="search" id="gs" placeholder="Cerca / Search" aria-label="Cerca / Search"><div id="gl-list">'+glList('')+'</div></div>';
   el.hidden=false;document.body.style.overflow='hidden';
 }
+var ITV=null,ITV_TRIED=false;
+function pickVoice(){
+  try{
+    var vs=window.speechSynthesis.getVoices()||[];
+    var it=vs.filter(function(v){return /^it([-_]|$)/i.test(v.lang)||/ital/i.test(v.name)});
+    if(!it.length)return null;
+    function sc(v){var n=v.name||'',x=0;if(/^it[-_]IT/i.test(v.lang))x+=3;if(/premium|enhanced|natural|neural|google|siri/i.test(n))x+=4;if(/alice|federica|elsa|paola|luca|isabella|diego|emma|giorgio/i.test(n))x+=2;if(v.localService===false)x+=1;return x}
+    it.sort(function(p,q){return sc(q)-sc(p)});
+    return it[0];
+  }catch(e){return null}
+}
+function refreshSay(){ITV=TTS?pickVoice():null;SAY=ITV?SAYB:''}
+refreshSay();
+if(TTS){try{window.speechSynthesis.onvoiceschanged=function(){var had=!!SAY;refreshSay();if(!!SAY!==had){var ap=document.getElementById('app');if(ap&&ap.innerHTML)render()}};if(window.speechSynthesis.getVoices)window.speechSynthesis.getVoices()}catch(e){}}
+function prepSpeech(t){
+  return t.replace(/[«»“”"]/g,'').replace(/\s+/g,' ')
+   .replace(/\b(\d{1,2}):00\b/g,'$1 in punto')
+   .replace(/\b(\d{1,2}):(\d{2})\b/g,'$1 e $2')
+   .replace(/\s*[—–]\s*/g,', ').replace(/…/g,'.').trim();
+}
+function chunks(t){
+  var parts=t.match(/[^.!?;:]+[.!?;:]*/g)||[t],out=[],cur='';
+  parts.forEach(function(p){if((cur+p).length>170&&cur){out.push(cur);cur=p}else cur+=p});
+  if(cur)out.push(cur);
+  return out.map(function(x){return x.trim()}).filter(Boolean);
+}
 function speak(card,btn){
   if(!TTS)return;
   try{
     var ss=window.speechSynthesis;
     if(btn.getAttribute('aria-pressed')==='true'){ss.cancel();btn.setAttribute('aria-pressed','false');return}
     ss.cancel();$$('.ico[aria-pressed="true"]').forEach(function(b){b.setAttribute('aria-pressed','false')});
-    var txt=$$('.it',card).map(function(n){return n.textContent}).join(' ');
-    var u=new SpeechSynthesisUtterance(txt);u.lang='it-IT';u.rate=0.85;
-    var v=ss.getVoices().filter(function(x){return /^it/i.test(x.lang)})[0];if(v)u.voice=v;
-    btn.setAttribute('aria-pressed','true');u.onend=u.onerror=function(){btn.setAttribute('aria-pressed','false')};ss.speak(u);
+    var txt=prepSpeech($$('.it',card).map(function(n){return n.textContent}).join(' '));
+    var v=ITV||pickVoice();ITV=v;
+    var gl=$('.gloss',card);
+    if(!v&&gl){gl.innerHTML='Voce italiana non trovata sul telefono. Nelle impostazioni, scarica o scegli una voce italiana (Sintesi vocale).<br><i>Italian voice not found on your phone. In Settings, download or choose an Italian voice (Text-to-speech).</i>';gl.hidden=false}
+    var list=chunks(txt),i=0;
+    btn.setAttribute('aria-pressed','true');
+    (function next(){
+      if(i>=list.length||btn.getAttribute('aria-pressed')!=='true'){btn.setAttribute('aria-pressed','false');return}
+      var u=new SpeechSynthesisUtterance(list[i++]);
+      u.lang=v?v.lang.replace('_','-'):'it-IT';if(v)u.voice=v;u.rate=0.92;u.pitch=1;
+      u.onend=next;u.onerror=function(){btn.setAttribute('aria-pressed','false')};
+      ss.speak(u);
+    })();
   }catch(e){btn.setAttribute('aria-pressed','false')}
 }
 document.addEventListener('click',function(ev){
